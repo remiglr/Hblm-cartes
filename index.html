@@ -1,0 +1,1136 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cartes HBLM</title>
+<meta name="description" content="Le jeu de cartes à collectionner des licenciés du Handball Lunel Marsillargues.">
+<meta name="theme-color" content="#6B3A8C">
+<meta name="robots" content="noindex">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Cartes HBLM">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Layout : appli plein écran, en-tête compteur + vue + barre d'onglets fixe en bas (style carton de match : papier, encre, lignes de terrain) */
+:root {
+  --bg: #ECE8DA; --panel: #F7F4EA; --ink: #23221F; --muted: #5D594F; --line: #CFC8B4; --accent: #6B3A8C; --accent-ink: #FFFFFF;
+  --good: #2F7A3E; --warn: #9A5B12; --sea: #2F6DB5;
+  --card-paper: #F3F0E4; --card-art: #F7F4EA; --card-ink: #23221F; --card-muted: #5D594F; --card-rule: #C9C3B1; --card-bar: #FBF9F2; --card-fill: #3A3833; --card-limit: #7A3E9D; --card-sil: #F7F1E3;
+  --r-com: #8D9198; --r-com-ink: #4A4F57; --r-pc: #3E8E4E; --r-pc-ink: #276633; --r-rare: #2F6DB5; --r-rare-ink: #245A99; --r-epi: #7B4CB0; --r-epi-ink: #5B3590; --r-leg: #B8862A; --r-leg-ink: #7A520C; --r-leg-pill: #F1D58C;
+  --t-ville: #F1E3DC; --t-ville-l: #C08A7A; --t-ville-i: #8A3A2F; --t-mer: #D6E8F1; --t-mer-l: #5B92BF; --t-mer-i: #1F4E79; --t-mont: #EFE6D6; --t-mont-l: #B9824A; --t-mont-i: #6B421C; --t-camp: #E6EED2; --t-camp-l: #9DB27A; --t-camp-i: #3D6330;
+  --f-display: 'Barlow Condensed', 'Arial Narrow', 'Roboto Condensed', sans-serif;
+  --f-body: 'Barlow', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #1B1A17; --panel: #26241F; --ink: #EDE8DA; --muted: #ABA493; --line: #403C33; --accent: #B88BD8; --accent-ink: #1B1A17; --good: #7CC48A; --warn: #E0A35A; --sea: #7FB0E6; color-scheme: dark } }
+:root[data-theme="dark"] { --bg: #1B1A17; --panel: #26241F; --ink: #EDE8DA; --muted: #ABA493; --line: #403C33; --accent: #B88BD8; --accent-ink: #1B1A17; --good: #7CC48A; --warn: #E0A35A; --sea: #7FB0E6; color-scheme: dark }
+
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; margin: 0; overflow: hidden; -webkit-tap-highlight-color: transparent; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+button { font: inherit; color: inherit; }
+.app { height: 100%; display: flex; flex-direction: column; }
+.top { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 10px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); border-bottom: 1px solid var(--line); background: var(--bg); }
+.brand { font-family: var(--f-display); font-weight: 700; font-size: 19px; white-space: nowrap; min-width: 0; letter-spacing: .06em; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+.brand svg { flex: none; }
+.wallet { display: flex; gap: 10px; font-family: var(--f-display); font-weight: 600; font-size: 15px; font-variant-numeric: tabular-nums; }
+.wallet span { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); }
+main { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding-block: 16px 24px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.view { max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+nav.tabs { flex: none; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border-top: 1px solid var(--line); background: var(--panel); padding-bottom: env(safe-area-inset-bottom, 0px); padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
+nav.tabs button { background: none; border: 0; padding: 8px 4px 9px; display: flex; flex-direction: column; align-items: center; gap: 3px; font-family: var(--f-display); font-weight: 600; font-size: 12px; letter-spacing: .02em; text-transform: uppercase; color: var(--muted); cursor: pointer; min-height: 52px; position: relative; min-width: 0; white-space: nowrap; }
+@media (max-width: 360px) { nav.tabs button { font-size: 10.5px; letter-spacing: 0; } }
+nav.tabs button[aria-selected="true"] { color: var(--ink); }
+nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute; top: -1px; left: 22%; right: 22%; height: 3px; background: var(--accent); border-radius: 0 0 3px 3px; }
+nav.tabs .dot { position: absolute; top: 6px; right: calc(50% - 20px); min-width: 16px; height: 16px; border-radius: 8px; background: var(--accent); color: var(--accent-ink); font-size: 11px; line-height: 16px; letter-spacing: 0; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+h2 { font-family: var(--f-display); font-weight: 700; font-size: 26px; letter-spacing: .02em; text-transform: uppercase; margin: 0; text-wrap: balance; line-height: 1.05; }
+h3 { font-family: var(--f-display); font-weight: 700; font-size: 17px; letter-spacing: .08em; text-transform: uppercase; margin: 0; color: var(--muted); }
+p { margin: 0; line-height: 1.45; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+.num { font-variant-numeric: tabular-nums; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; padding: 0 18px; border-radius: 10px; border: 1.5px solid var(--ink); background: var(--ink); color: var(--bg); font-family: var(--f-display); font-weight: 700; font-size: 17px; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; }
+.btn.ghost { background: transparent; color: var(--ink); }
+.btn.accent { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn.wide { width: 100%; }
+.btn.sm { min-height: 38px; font-size: 14px; padding: 0 12px; }
+select, input[type="search"] { font: inherit; min-height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); width: 100%; box-sizing: border-box; }
+.loading { padding: 60px 0; text-align: center; color: var(--muted); font-family: var(--f-display); letter-spacing: .1em; text-transform: uppercase; }
+
+/* ---------- Booster ---------- */
+.pile { display: flex; justify-content: center; padding: 8px 0 4px; }
+.pile .stack { position: relative; width: 168px; height: 236px; }
+.pile .stack > div { position: absolute; inset: 0; }
+.stockline { display: flex; justify-content: space-between; align-items: baseline; font-family: var(--f-display); }
+.stockline b { font-size: 34px; font-weight: 700; }
+.gauge { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 4px; }
+.gauge i { height: 8px; border-radius: 2px; background: var(--line); }
+.gauge i.on { background: var(--accent); }
+
+/* ---------- Carte ---------- */
+.card { --cw: 300px; width: var(--cw); max-width: 100%; aspect-ratio: 5 / 7; font-size: calc(var(--cw) / 30); box-sizing: border-box; padding: .8em; border-radius: 1.4em; background: var(--rc); color: var(--card-ink); font-family: var(--f-body); position: relative; flex: none; }
+.card.r0 { --rc: var(--r-com); --rci: var(--r-com-ink); --rpill: var(--r-com-ink); --rpill-ink: #FFFFFF; }
+.card.r1 { --rc: var(--r-pc); --rci: var(--r-pc-ink); --rpill: var(--r-pc-ink); --rpill-ink: #FFFFFF; }
+.card.r2 { --rc: var(--r-rare); --rci: var(--r-rare-ink); --rpill: var(--r-rare); --rpill-ink: #FFFFFF; }
+.card.r3 { --rc: var(--r-epi); --rci: var(--r-epi-ink); --rpill: var(--r-epi); --rpill-ink: #FFFFFF; }
+.card.r4 { --rc: repeating-linear-gradient(135deg, var(--r-leg) 0 1.4em, #D8AE52 1.4em 2.2em, var(--r-leg) 2.2em 3.6em); --rci: var(--r-leg-ink); --rpill: var(--r-leg-pill); --rpill-ink: #5A3E05; }
+.card .in { height: 100%; box-sizing: border-box; border-radius: .9em; background: var(--card-paper); padding: 1em; display: flex; flex-direction: column; gap: .6em; overflow: hidden; }
+.card .hd { display: flex; justify-content: space-between; align-items: center; font-family: var(--f-display); }
+.card .no { font-weight: 600; font-size: 1.15em; letter-spacing: .08em; color: var(--card-muted); }
+.card .pill { font-weight: 700; font-size: 1.05em; letter-spacing: .1em; padding: .15em .8em; border-radius: 999px; background: var(--rpill); color: var(--rpill-ink); text-transform: uppercase; }
+.card .nm { font-family: var(--f-display); font-weight: 700; font-size: 3em; line-height: .98; letter-spacing: .02em; text-transform: uppercase; margin: 0; overflow-wrap: anywhere; }
+.card .nm.l { font-size: 2.3em; } .card .nm.xl { font-size: 1.85em; }
+.card .sub { display: flex; justify-content: space-between; gap: .6em; font-size: 1.2em; color: var(--card-muted); margin-top: -.25em; }
+.card .sub span:last-child { font-family: var(--f-display); white-space: nowrap; }
+.card .art { position: relative; border: .15em solid var(--card-ink); background: var(--tb); aspect-ratio: 318 / 178; flex: none; overflow: hidden; }
+.card .art > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.card .ttag svg { width: 1.2em; height: 1.2em; flex: none; }
+.card .ttag { position: absolute; left: .7em; bottom: .7em; display: flex; align-items: center; gap: .5em; background: var(--card-art); border: 1px solid var(--card-ink); padding: .3em .7em; font-family: var(--f-display); font-weight: 700; font-size: 1.05em; letter-spacing: .1em; text-transform: uppercase; color: var(--ti); }
+.card .ttag.it { font-style: italic; }
+.card .stats { display: flex; flex-direction: column; gap: .45em; padding: 0 .2em; }
+.card .st { display: grid; grid-template-columns: 1.6em 7em minmax(0, 1fr) 2.6em; align-items: center; column-gap: .7em; height: 1.9em; }
+.card .st svg { width: 1.6em; height: 1.6em; }
+.card .st .lb { font-family: var(--f-display); font-weight: 600; font-size: 1.2em; white-space: nowrap; letter-spacing: .05em; text-transform: uppercase; }
+.card .st .bar { height: .8em; border: 1px solid var(--card-ink); background: var(--card-bar); }
+.card .st .bar i { display: block; height: 100%; background: var(--card-fill); }
+.card .st .v { font-family: var(--f-display); font-weight: 700; font-size: 1.5em; text-align: right; font-variant-numeric: tabular-nums; }
+.card .st.best .lb { font-weight: 700; } .card .st.best .bar i { background: var(--rci); } .card .st.best .v { color: var(--rci); }
+.card .stats.hashl .st:not(.hl) { opacity: .3; }
+.card .st.hl { background: #FFE9A6; outline: .2em solid var(--card-limit); outline-offset: .15em; border-radius: .3em; }
+.card .st.hl .lb, .card .st.hl .v { font-weight: 700; color: var(--card-ink); }
+.card .st.hl .bar i { background: var(--card-limit); }
+.statban { display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-radius: 12px; background: var(--accent); color: var(--accent-ink); }
+.statban svg { width: 38px; height: 38px; flex: none; }
+.statban .sl { display: flex; flex-direction: column; min-width: 0; }
+.statban .sl span { font-family: var(--f-display); font-weight: 600; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; opacity: .85; }
+.statban .sl b { font-family: var(--f-display); font-weight: 700; font-size: 30px; line-height: 1; letter-spacing: .06em; text-transform: uppercase; }
+.statban .sv { margin-left: auto; display: flex; align-items: baseline; gap: 8px; font-family: var(--f-display); font-variant-numeric: tabular-nums; }
+.statban .sv b { font-size: 34px; font-weight: 700; line-height: 1; }
+.statban .sv span { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; opacity: .85; }
+@keyframes banIn { from { opacity: 0; transform: scale(.92); } }
+.statban { animation: banIn .3s cubic-bezier(.2,.8,.2,1) both; }
+.card .an { font-style: italic; font-size: 1.2em; line-height: 1.3; color: var(--card-fill); border-top: 1px solid var(--card-rule); padding-top: .55em; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.card .ft { margin-top: auto; display: flex; justify-content: space-between; font-family: var(--f-display); font-weight: 600; font-size: 1.1em; letter-spacing: .06em; text-transform: uppercase; color: var(--card-muted); }
+.card.ghost { filter: grayscale(1); opacity: .55; }
+.t0 { --tb: var(--t-camp); --tl: var(--t-camp-l); --ti: var(--t-camp-i); }
+.t1 { --tb: var(--t-mer); --tl: var(--t-mer-l); --ti: var(--t-mer-i); }
+.t2 { --tb: var(--t-ville); --tl: var(--t-ville-l); --ti: var(--t-ville-i); }
+.t3 { --tb: var(--t-mont); --tl: var(--t-mont-l); --ti: var(--t-mont-i); }
+.card .lat { position: absolute; right: .7em; top: .7em; background: var(--card-ink); color: var(--card-paper); padding: .25em .7em; font-family: var(--f-display); font-weight: 700; font-size: 1em; letter-spacing: .12em; text-transform: uppercase; }
+.card .art .jer { position: absolute; left: 50%; top: 8%; height: 84%; width: auto; transform: translateX(-42%); filter: drop-shadow(0 .25em .3em rgba(0,0,0,.25)); }
+/* Dos de carte */
+.back { --cw: 300px; width: var(--cw); max-width: 100%; aspect-ratio: 5 / 7; font-size: calc(var(--cw) / 30); box-sizing: border-box; padding: .8em; border-radius: 1.4em; background: #33312C; position: relative; flex: none; }
+.back .in { position: relative; height: 100%; border-radius: .9em; background: var(--tb); overflow: hidden; }
+.back svg.topo { position: absolute; inset: 0; width: 100%; height: 100%; }
+.back .band { position: absolute; left: 1.4em; right: 1.4em; display: flex; justify-content: center; background: var(--card-paper); border: .15em solid var(--card-ink); padding: .5em 0; font-family: var(--f-display); font-weight: 700; font-size: 1.25em; letter-spacing: .3em; color: var(--card-ink); }
+.back .band.t { top: 1.4em; } .back .band.b { bottom: 1.4em; font-size: 1em; letter-spacing: .14em; }
+.back .emb { position: absolute; left: 50%; top: 50%; width: 15em; height: 15em; transform: translate(-50%, -50%); border-radius: 50%; background: var(--card-paper); border: .2em solid var(--card-ink); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .6em; }
+.back .emb svg { width: 5em; height: 5em; }
+.back .emb b { font-family: var(--f-display); font-weight: 700; font-size: 2.2em; letter-spacing: .12em; color: var(--ti); text-transform: uppercase; }
+.back .emb b.it { font-style: italic; }
+
+/* Ouverture */
+.overlay { position: fixed; inset: 0; z-index: 20; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding-top: max(16px, env(safe-area-inset-top, 0px)); padding-bottom: max(16px, env(safe-area-inset-bottom, 0px)); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); overflow-y: auto; }
+.overlay[hidden] { display: none !important; }
+.flip { --cw: min(320px, 82vw, calc((100vh - 220px) * 5 / 7)); width: var(--cw); aspect-ratio: 5 / 7; perspective: 1400px; cursor: pointer; border: 0; padding: 0; background: none; }
+.flip .fl { position: relative; width: 100%; height: 100%; transition: transform .55s cubic-bezier(.3,.7,.2,1); transform-style: preserve-3d; }
+.flip.open .fl { transform: rotateY(180deg); }
+.flip .face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.flip .face.front { transform: rotateY(180deg); }
+.flip .face > div { --cw: 100%; width: 100%; height: 100%; font-size: calc(min(320px, 82vw, calc((100vh - 220px) * 5 / 7)) / 30); }
+.flip .fl { transition: transform .55s cubic-bezier(.3,.7,.2,1); }
+.flip .front .card { transition: box-shadow .5s .4s ease; }
+
+/* ---------- Animations ---------- */
+@keyframes viewIn { from { opacity: 0; transform: translateY(10px); } }
+main.enter > .view { animation: viewIn .32s cubic-bezier(.2,.7,.2,1) both; }
+@keyframes growX { from { transform: scaleX(0); } }
+main.enter .prog i { transform-origin: left; animation: growX .8s .1s cubic-bezier(.2,.7,.2,1) both; }
+@keyframes bump { 30% { transform: scale(1.18); } }
+.bump { animation: bump .45s ease-out; }
+.btn, .tile, .mini, .dep { transition: transform .12s ease, background-color .2s, opacity .2s; }
+.btn:not(:disabled):active, .tile:active, .dep:active, .mini:active { transform: scale(.97); }
+@keyframes fadeIn { from { opacity: 0; } }
+.overlay:not([hidden]) { animation: fadeIn .2s ease-out; }
+@keyframes sheetIn { from { opacity: 0; transform: translateY(24px) scale(.96); } }
+.sheet { animation: sheetIn .3s cubic-bezier(.2,.7,.2,1) both; }
+@keyframes float { 50% { transform: translateY(-6px); } }
+.pile .stack > div:last-child { animation: float 4s ease-in-out infinite; }
+.pack { border: 0; background: none; padding: 0; display: flex; flex-direction: column; align-items: center; gap: 16px; color: var(--ink); }
+.pack .packin { animation: packShake .9s ease-in-out infinite; filter: drop-shadow(0 18px 22px rgba(0, 0, 0, .28)); }
+.pack .packin .back { --cw: min(230px, 58vw); }
+@keyframes packShake { 0%, 100% { transform: rotate(0); } 20% { transform: rotate(-3deg) translateY(-5px); } 40% { transform: rotate(3deg); } 60% { transform: rotate(-2deg) translateY(-2px); } 80% { transform: rotate(1.5deg); } }
+.pack.torn .packin { animation: packOut .45s cubic-bezier(.5,0,.8,.3) forwards; }
+@keyframes packOut { to { transform: scale(1.3) rotate(-4deg); opacity: 0; filter: brightness(2.2); } }
+.packlbl { font-family: var(--f-display); font-weight: 700; font-size: 15px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+@keyframes dealIn { from { opacity: 0; transform: translateY(40px) rotate(-6deg) scale(.9); } }
+.flip.deal { animation: dealIn .38s cubic-bezier(.2,.8,.2,1) both; }
+.flip.rr2.open .front .card { box-shadow: 0 0 22px 4px rgba(47, 109, 181, .6); }
+.flip.rr3.open .front .card { box-shadow: 0 0 28px 6px rgba(123, 76, 176, .75); }
+.flip.rr4.open .front .card { box-shadow: 0 0 36px 8px rgba(216, 174, 82, .9); }
+.card .in { position: relative; }
+.card.r4 .in::after { content: ""; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, .6) 50%, transparent 65%); transform: translateX(-130%); pointer-events: none; }
+.flip.open .card.r4 .in::after { animation: shine 1.3s .55s ease-in-out; }
+@keyframes shine { to { transform: translateX(130%); } }
+@keyframes popIn { 0% { transform: scale(.4); opacity: 0; } 70% { transform: scale(1.12); } }
+.badge.pop { animation: popIn .4s .35s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes tileIn { from { opacity: 0; transform: translateY(14px) scale(.92); } }
+.sumgrid .tile { animation: tileIn .35s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--k, 0) * 45ms); }
+.duelres .card { animation: dealIn .4s cubic-bezier(.2,.8,.2,1) both; }
+.duelres .card + .card { animation-delay: .14s; }
+@keyframes toastIn { from { opacity: 0; transform: translate(-50%, 12px); } }
+.toast:not([hidden]) { animation: toastIn .25s cubic-bezier(.2,.8,.2,1); }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+.badge { font-family: var(--f-display); font-weight: 700; font-size: 15px; letter-spacing: .12em; text-transform: uppercase; padding: 4px 12px; border-radius: 999px; }
+.badge.new { background: var(--good); color: var(--bg); }
+.badge.dup { background: var(--line); color: var(--ink); }
+.dots { display: flex; gap: 6px; }
+.dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+.dots i.on { background: var(--accent); }
+.sumgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 10px; width: min(560px, 100%); }
+
+/* ---------- Collection ---------- */
+.prog { height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; }
+.prog i { display: block; height: 100%; background: var(--accent); }
+.region { display: flex; flex-direction: column; gap: 2px; }
+.dep { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 6px; border: 0; border-bottom: 1px solid var(--line); background: none; text-align: left; cursor: pointer; width: 100%; }
+.dep .code { min-width: 40px; padding: 0 4px; box-sizing: border-box; height: 32px; display: grid; place-items: center; border: 1.5px solid var(--ink); border-radius: 4px; font-family: var(--f-display); font-weight: 700; font-size: 15px; }
+.dep .code.full { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.dep .nm { font-weight: 600; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.dep .nm span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dep .ct { font-family: var(--f-display); font-weight: 600; font-variant-numeric: tabular-nums; color: var(--muted); }
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
+.tile { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); padding: 6px 6px 8px; display: flex; flex-direction: column; gap: 4px; cursor: pointer; text-align: left; position: relative; min-width: 0; }
+.tile .sil { aspect-ratio: 1; border-radius: 5px; background: var(--tb); display: grid; place-items: center; overflow: hidden; }
+.tile .sil svg { width: 82%; height: 82%; }
+.tile .tn { font-family: var(--f-display); font-weight: 600; font-size: 13px; line-height: 1.1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tile .tv { font-family: var(--f-display); font-weight: 600; font-size: 12px; color: var(--muted); }
+.tile .rb { height: 3px; border-radius: 2px; background: var(--rc); }
+.tile.miss { background: transparent; border-style: dashed; }
+.tile.miss .sil { background: transparent; filter: grayscale(1); opacity: .45; }
+.tile.miss .tn { color: var(--muted); font-weight: 500; }
+.tile .x { position: absolute; top: 4px; right: 4px; font-family: var(--f-display); font-weight: 700; font-size: 12px; padding: 0 6px; border-radius: 999px; background: var(--ink); color: var(--bg); }
+.r0 { --rc: var(--r-com); } .r1 { --rc: var(--r-pc); } .r2 { --rc: var(--r-rare); } .r3 { --rc: var(--r-epi); } .r4 { --rc: var(--r-leg); }
+.filters { gap: 10px; padding: 12px; }
+.fgrp { display: flex; flex-direction: column; gap: 6px; }
+.flb { font-family: var(--f-display); font-weight: 600; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.filters .seg { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-inline: -2px; padding: 1px 2px; }
+.filters .seg::-webkit-scrollbar { display: none; }
+.filters .seg button { flex: none; white-space: nowrap; }
+.seg { display: flex; gap: 6px; flex-wrap: wrap; }
+.seg button { border: 1px solid var(--line); background: var(--panel); border-radius: 999px; padding: 6px 12px; font-family: var(--f-display); font-weight: 600; font-size: 14px; letter-spacing: .04em; cursor: pointer; min-height: 36px; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.results { display: flex; flex-direction: column; }
+.res { display: flex; justify-content: space-between; gap: 10px; padding: 10px 4px; border: 0; border-bottom: 1px solid var(--line); background: none; text-align: left; cursor: pointer; width: 100%; }
+.res b { font-weight: 600; } .res span { color: var(--muted); font-size: 13px; white-space: nowrap; }
+.sheet { width: min(420px, 100%); display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.sheet .acts { display: flex; flex-direction: column; gap: 10px; width: min(320px, 100%); }
+.costs { display: flex; justify-content: center; gap: 12px; font-family: var(--f-display); font-weight: 600; }
+
+/* ---------- Combat ---------- */
+.hand { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.mini { border: 2px solid var(--rc); border-radius: 8px; background: var(--card-paper); color: var(--card-ink); padding: 4px; display: flex; flex-direction: column; gap: 3px; cursor: pointer; min-width: 0; text-align: left; }
+.mini .sil { aspect-ratio: 1; background: var(--tb); border-radius: 4px; display: grid; place-items: center; }
+.mini .sil svg { width: 80%; height: 80%; }
+.mini .tn { font-family: var(--f-display); font-weight: 700; font-size: 11px; line-height: 1.05; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: uppercase; }
+.mini .ms { font-family: var(--f-display); font-size: 10.5px; color: var(--card-muted); font-variant-numeric: tabular-nums; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); text-align: center; }
+.mini.sel { outline: 3px solid var(--accent); outline-offset: 1px; }
+.mini.used { opacity: .3; pointer-events: none; }
+.score { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; font-family: var(--f-display); text-align: center; }
+.score b { font-size: 40px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.score span { font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.statpick { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.statpick button { border: 1px solid var(--line); background: var(--panel); border-radius: 8px; padding: 8px 2px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-family: var(--f-display); font-weight: 600; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; cursor: pointer; min-height: 56px; }
+.statpick button b { font-size: 18px; }
+.statpick button[aria-pressed="true"] { border-color: var(--accent); outline: 2px solid var(--accent); }
+.log { display: flex; flex-direction: column; gap: 6px; }
+.log p { font-size: 14px; padding-left: 10px; border-left: 3px solid var(--line); }
+.log p.win { border-color: var(--good); } .log p.lose { border-color: var(--warn); }
+.oppback { display: flex; align-items: center; gap: 12px; }
+.oppback .back { --cw: 84px; }
+.duelres { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+.duelres .card { --cw: 156px; }
+
+/* ---------- Marché ---------- */
+.offer { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.offer .sw { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.offer .sw div { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chip { display: inline-block; width: 9px; height: 9px; border-radius: 2px; background: var(--rc); margin-right: 6px; vertical-align: 1px; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(76px + env(safe-area-inset-bottom, 0px)); z-index: 30; background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 10px; font-weight: 500; max-width: calc(100% - 32px); box-sizing: border-box; text-align: center; }
+.toast[hidden] { display: none !important; }
+
+/* ---------- Écran Paquets ---------- */
+.center { text-align: center; }
+.packs { align-items: center; gap: 14px; }
+.packs .lead { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.bigpack { border: 0; background: none; padding: 18px 0 6px; cursor: pointer; position: relative; display: grid; place-items: center; }
+.bigpack::before { content: ""; position: absolute; width: 260px; height: 300px; border-radius: 50%; background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) 45%, transparent), transparent); filter: blur(8px); animation: glow 3s ease-in-out infinite; }
+.bigpack .back { --cw: min(210px, 54vw); position: relative; animation: float 4s ease-in-out infinite; box-shadow: 0 18px 30px rgba(0, 0, 0, .28); }
+.bigpack:disabled { cursor: default; } .bigpack:disabled .back { filter: grayscale(.8); opacity: .6; } .bigpack:disabled::before { opacity: .2; }
+@keyframes glow { 50% { transform: scale(1.08); opacity: .75; } }
+.stockbox { border: 1px solid var(--line); background: var(--panel); border-radius: 14px; padding: 14px 26px; text-align: center; display: flex; flex-direction: column; gap: 4px; }
+.stockbox .big { font-family: var(--f-display); font-size: 30px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.stockbox .big b { color: var(--accent); }
+details.panel > summary { cursor: pointer; font-family: var(--f-display); font-weight: 700; font-size: 17px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); list-style: none; display: flex; justify-content: space-between; }
+details.panel > summary::after { content: "+"; } details.panel[open] > summary::after { content: "–"; }
+details.panel { width: 100%; box-sizing: border-box; }
+
+/* ---------- Collection en grille ---------- */
+.head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.head h2 { font-size: 30px; }
+.head .btn { white-space: nowrap; flex: none; }
+.tabsub { display: flex; border-bottom: 1px solid var(--line); gap: 4px; overflow-x: auto; scrollbar-width: none; }
+.tabsub button { flex: none; border: 0; background: none; padding: 10px 12px; font-family: var(--f-display); font-weight: 600; font-size: 16px; letter-spacing: .04em; color: var(--muted); cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -1px; }
+.tabsub button[aria-selected="true"] { color: var(--ink); border-color: var(--accent); }
+.rchips { display: flex; gap: 6px; flex-wrap: wrap; }
+.rchips button { min-width: 44px; min-height: 36px; border-radius: 999px; border: 1.5px solid var(--rc); background: transparent; color: var(--ink); font-family: var(--f-display); font-weight: 700; font-size: 14px; letter-spacing: .06em; cursor: pointer; }
+.rchips button[aria-pressed="true"] { background: var(--rc); color: #FFFFFF; }
+.pager { display: grid; grid-template-columns: 64px 1fr 64px; justify-items: center; align-items: center; gap: 8px; }
+.pager .btn { min-height: 40px; font-size: 14px; padding: 0 10px; }
+.pager .btn { width: 100%; }
+.pager span { font-family: var(--f-display); font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@media (min-width: 520px) { .grid2 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.gc { position: relative; border: 0; padding: 0; border-radius: 14px; overflow: hidden; background: var(--card-paper); color: var(--card-ink); text-align: left; cursor: pointer; display: flex; flex-direction: column; box-shadow: 0 0 0 2px var(--rc), 0 6px 14px rgba(0, 0, 0, .12); min-width: 0; transition: transform .12s ease; }
+.gc:active { transform: scale(.97); }
+.gc.r4 { box-shadow: 0 0 0 2px var(--r-leg), 0 0 16px rgba(216, 174, 82, .55); }
+.gc.r3 { box-shadow: 0 0 0 2px var(--r-epi), 0 0 12px rgba(123, 76, 176, .4); }
+.gc .ga { position: relative; aspect-ratio: 4 / 3; background: var(--tb); overflow: hidden; }
+.gc .ga > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.gc .ga .gs { position: absolute; inset: 10% 18%; width: 64%; height: 80%; }
+.gc .rk { position: absolute; top: 8px; left: 8px; font-family: var(--f-display); font-weight: 700; font-size: 13px; letter-spacing: .06em; padding: 2px 8px; border-radius: 6px; background: var(--rc); color: #FFFFFF; }
+.gc.r4 .rk { color: #3B2803; background: var(--r-leg-pill); }
+.gc .star { position: absolute; top: 4px; right: 4px; width: 36px; height: 36px; display: grid; place-items: center; border: 0; background: none; cursor: pointer; color: var(--card-ink); }
+.gc .star svg { width: 22px; height: 22px; filter: drop-shadow(0 1px 1px rgba(255, 255, 255, .8)); }
+.gc .star.on { color: #B8862A; }
+.gc .xn { position: absolute; bottom: 6px; right: 6px; font-family: var(--f-display); font-weight: 700; font-size: 12px; padding: 1px 7px; border-radius: 999px; background: var(--card-ink); color: var(--card-paper); }
+.gc .gb { padding: 8px 10px 10px; display: flex; flex-direction: column; gap: 2px; border-top: 1px solid var(--card-rule); }
+.gc .gn { font-family: var(--f-display); font-weight: 700; font-size: 17px; line-height: 1.05; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gc .gd { font-size: 12.5px; color: var(--card-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gc .gst { display: flex; justify-content: space-between; margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--card-rule); font-family: var(--f-display); font-weight: 700; font-size: 15px; font-variant-numeric: tabular-nums; }
+.gc .gst span { display: inline-flex; align-items: center; gap: 4px; }
+.gc .gst svg { width: 15px; height: 15px; }
+.gc.miss { filter: grayscale(1); opacity: .5; }
+.gc.picked { box-shadow: 0 0 0 4px var(--accent), 0 6px 14px rgba(0, 0, 0, .12); }
+.gc .ck { position: absolute; top: 8px; right: 8px; width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--card-ink); background: var(--card-paper); display: grid; place-items: center; font-weight: 700; }
+.gc.picked .ck { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.gc .gx { padding: 8px 10px 10px; display: flex; justify-content: space-between; gap: 6px; align-items: flex-end; background: var(--panel); color: var(--ink); border-top: 1px solid var(--line); }
+.gc .gx .lbl { font-family: var(--f-display); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.gc .gx b { font-family: var(--f-display); font-size: 18px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.gc .gx .who { font-size: 12px; color: var(--muted); grid-column: 1 / -1; }
+.selbar { position: sticky; bottom: 0; z-index: 5; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px; border-radius: 14px; background: var(--ink); color: var(--bg); box-shadow: 0 8px 24px rgba(0, 0, 0, .3); }
+.selbar b { font-family: var(--f-display); font-size: 16px; margin-right: auto; }
+.selbar .btn { min-height: 38px; font-size: 13px; padding: 0 10px; background: var(--bg); color: var(--ink); border-color: var(--bg); }
+.selbar .btn.ghost { background: transparent; color: var(--bg); border-color: var(--bg); }
+
+/* ---------- Enchères, menu Plus ---------- */
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field input[type="number"] { font: inherit; min-height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); box-sizing: border-box; width: 100%; }
+.menu { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow: hidden; }
+.menu button { display: flex; align-items: center; gap: 14px; padding: 16px; border: 0; border-bottom: 1px solid var(--line); background: none; text-align: left; cursor: pointer; font-size: 17px; font-weight: 500; }
+.menu button:last-child { border-bottom: 0; }
+.menu button svg { width: 24px; height: 24px; flex: none; }
+.menu button .mt { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.menu button .mt span { font-size: 13px; color: var(--muted); font-weight: 400; }
+.menu .pip { min-width: 20px; height: 20px; border-radius: 10px; background: var(--accent); color: var(--accent-ink); font-size: 12px; font-weight: 700; display: grid; place-items: center; padding: 0 5px; }
+.statgrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.statgrid div { border: 1px solid var(--line); border-radius: 12px; padding: 12px; background: var(--panel); display: flex; flex-direction: column; gap: 2px; }
+.statgrid b { font-family: var(--f-display); font-size: 26px; font-variant-numeric: tabular-nums; }
+.statgrid span { font-size: 13px; color: var(--muted); }
+.ach { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.ach .ai { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; background: var(--line); color: var(--muted); }
+.ach.done .ai { background: var(--accent); color: var(--accent-ink); }
+.ach .at { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.ach .at span { font-size: 13px; color: var(--muted); }
+.rank { display: grid; grid-template-columns: 34px 32px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.rank .pos { font-family: var(--f-display); font-weight: 700; font-size: 18px; color: var(--muted); text-align: center; }
+.rank img { width: 32px; height: 32px; border-radius: 50%; }
+.rank .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.rank .sc { font-family: var(--f-display); font-weight: 700; font-size: 18px; font-variant-numeric: tabular-nums; }
+.rank.me { background: color-mix(in srgb, var(--accent) 12%, transparent); border-radius: 10px; }
+</style>
+<style>
+/* ---------- PWA : 4 onglets, écran de connexion, bandeau d'installation ---------- */
+nav.tabs { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.app[hidden], #auth[hidden] { display: none !important; }
+#auth { height: 100%; overflow-y: auto; box-sizing: border-box; padding: max(24px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(24px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.auth { max-width: 420px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+.authhead { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; padding-top: 8px; }
+.authhead .back { box-shadow: 0 14px 26px rgba(0, 0, 0, .25); transform: rotate(-4deg); }
+.authhead h1 { font-family: var(--f-display); font-weight: 700; font-size: 38px; letter-spacing: .06em; text-transform: uppercase; margin: 6px 0 0; line-height: 1; }
+.field input[type="text"], .field input[type="password"] { font: inherit; font-size: 16px; min-height: 48px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); box-sizing: border-box; width: 100%; }
+.autherr { color: var(--warn); font-weight: 600; font-size: 14px; min-height: 1.2em; }
+input[type="search"] { font-size: 16px; }
+.hint { display: flex; align-items: center; gap: 10px; width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); font-size: 14px; }
+.hint span { flex: 1; }
+.hint .x { border: 0; background: none; color: var(--muted); font-size: 16px; cursor: pointer; width: 32px; height: 32px; }
+.tagnew { font-family: var(--f-display); font-weight: 700; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--good); }
+.offer .sw .muted { font-size: 12px; }
+.offer .sw div { white-space: normal; overflow: visible; }
+.head { flex-wrap: wrap; }
+img.photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; display: block; }
+.tile .sil { position: relative; }
+.sheet label.btn { cursor: pointer; }
+@media (max-width: 370px) { .brand { font-size: 16px; letter-spacing: .03em; gap: 6px; } .wallet { gap: 6px; font-size: 14px; } .wallet span { padding: 3px 7px; } }
+</style>
+</head>
+<body>
+
+<div id="auth" hidden></div>
+<div class="app" hidden>
+  <header class="top">
+    <div class="brand">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="11" cy="11" r="8.5"></circle><path d="M3.5 8.5c4 1.5 11 1.5 15 0M3.5 13.5c4-1.5 11-1.5 15 0M11 2.5c-2.5 3-2.5 14 0 17"></path></svg>
+      Cartes HBLM
+    </div>
+    <div class="wallet" aria-label="Ressources">
+      <span title="Pièces"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="5.6" fill="none" stroke="currentColor" stroke-width="1.5"></circle><path d="M7 4v6" stroke="currentColor" stroke-width="1.5"></path></svg><b id="coins" class="num">0</b></span>
+      <span title="Fragments de légendaire"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M7 1.5 12 6 7 12.5 2 6Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"></path></svg><b id="frags" class="num">0</b></span>
+    </div>
+  </header>
+  <main id="main"><div class="loading">Chargement des licenciés…</div></main>
+  <nav class="tabs" role="tablist" aria-label="Onglets">
+    <button role="tab" id="tab-booster" data-tab="booster" aria-selected="true">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="12" height="16" rx="2"></rect><path d="M8 3v-.5M5 7h12M5 15h12"></path></svg>
+      Paquets<span class="dot" id="stockdot" hidden></span>
+    </button>
+    <button role="tab" id="tab-collection" data-tab="collection" aria-selected="false">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M3 5l5-2 6 2 5-2v14l-5 2-6-2-5 2z"></path><path d="M8 3v14M14 5v14"></path></svg>
+      Collection
+    </button>
+    <button role="tab" id="tab-echanges" data-tab="echanges" aria-selected="false">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h13l-3-3M18 14H5l3 3"></path></svg>
+      Échanges
+    </button>
+    <button role="tab" id="tab-profil" data-tab="profil" aria-selected="false">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="8" r="3.6"></circle><path d="M4 19c1.3-3.6 4-5.4 7-5.4s5.7 1.8 7 5.4"></path></svg>
+      Profil
+    </button>
+  </nav>
+</div>
+<div class="overlay" id="overlay" hidden></div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script src="supabase.js"></script>
+<script>
+(() => {
+'use strict';
+// ------------------------------------------------------------------ constantes du jeu
+const BOOSTER_MS = 10 * 60 * 1000, STOCK_MAX = 10, CARDS_PER_BOOSTER = 5;
+const DROP_W = [10, 6, 3, 1.5, 0.6]; // chance relative de sortir selon la rareté
+const REGIONAL_BASE = 60; // prix d'un booster d'équipe « moyen » ; ajusté selon la valeur des cartes de l'équipe
+let DEP_PRICE = [];
+function computePrices() {
+  const val = r => CRAFT[r] + (r === 4 ? 0 : 0);
+  let tot = 0; for (let i = 0; i < N; i++) tot += val(C.r[i]); const nat = tot / N;
+  DEP_PRICE = C.deps.map(d => { let s = 0; for (let i = d.s; i < d.s + d.k; i++) s += val(C.r[i]); return Math.max(30, Math.round(REGIONAL_BASE * (s / d.k) / nat / 10) * 10); });
+}
+const regPrice = j => DEP_PRICE[j] || REGIONAL_BASE;
+const RECYCLE = [1, 2, 5, 15, 0];            // pièces par doublon selon rareté (légendaire -> fragment)
+const CRAFT = [20, 40, 100, 250, 600];      // pièces pour fabriquer
+const CRAFT_FRAGS = 5;                      // + fragments pour une légendaire
+const RAR_NAMES = ['Commune', 'Peu commune', 'Rare', 'Épique', 'Légendaire'];
+const RAR_MARK = ['', '▲ ', '● ', '◆ ', '★ '];
+const TYPE_NAMES = ['École de hand', 'Jeunes', 'Adultes', 'Staff'];
+const BACK_NAMES = ['École', 'Jeunes', 'Adultes', 'Staff'];
+const GROUPS = ['École de hand', 'Jeunes', 'Adultes', 'Le club'];
+const STAT_NAMES = ['Tir', 'Passe', 'Défense', 'Vitesse', 'Mental'];
+const ICON = {
+  st: [
+    '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="8" r="3.6"/><path d="M8.2 5.3c1.3.9 3.3.9 4.6 0M8.2 10.7c1.3-.9 3.3-.9 4.6 0M1.5 5.5h4M1 8h3.5M1.5 10.5h4"/></svg>',
+    '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12C4 5 10 4 13.5 6.5"/><path d="M11 4l2.8 2.6-3.4 1.3"/><circle cx="2.6" cy="12.6" r="1.2" fill="currentColor"/></svg>',
+    '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" aria-hidden="true"><path d="M8 1.6 13.5 3.6V8c0 3.1-2.3 5.4-5.5 6.4C4.8 13.4 2.5 11.1 2.5 8V3.6Z"/><path d="M8 4.5v7"/></svg>',
+    '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 1.5 3.5 9h4l-1 5.5 6-7.5h-4z"/></svg>',
+    '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" aria-hidden="true"><path d="M8 13.8S2 10.3 2 6.2C2 4.2 3.5 2.8 5.2 2.8c1.2 0 2.2.6 2.8 1.6.6-1 1.6-1.6 2.8-1.6 1.7 0 3.2 1.4 3.2 3.4 0 4.1-6 7.6-6 7.6z"/></svg>'],
+  type: [
+    '<svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5.3" fill="var(--t-camp)" stroke="var(--t-camp-i)"/><path d="M1.6 4.6c2.6 1 6.2 1 8.8 0M1.6 7.4c2.6-1 6.2-1 8.8 0" fill="none" stroke="var(--t-camp-i)" stroke-width=".8"/></svg>',
+    '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3.6 1 5 .6Q6 1.6 7 .6L8.4 1 11.4 3.4 10 5.6 8.8 4.8V11.4H3.2V4.8L2 5.6.6 3.4Z" fill="var(--t-mer)" stroke="var(--t-mer-i)" stroke-width=".8" stroke-linejoin="round"/></svg>',
+    '<svg viewBox="0 0 12 12" aria-hidden="true"><rect x="1" y="2.5" width="10" height="8" fill="var(--t-ville)" stroke="var(--t-ville-i)"/><path d="M1 5.2h10M1 7.8h10M3.5 2.5v8M6 2.5v8M8.5 2.5v8" stroke="var(--t-ville-i)" stroke-width=".5"/></svg>',
+    '<svg viewBox="0 0 12 12" aria-hidden="true"><rect x="2" y="1.5" width="8" height="10" rx="1" fill="var(--t-mont)" stroke="var(--t-mont-i)"/><path d="M4 1.5h4v1.5H4zM3.8 5.5h4.4M3.8 7.5h4.4M3.8 9.5h2.6" stroke="var(--t-mont-i)" stroke-width=".8" fill="none"/></svg>'],
+  big: [
+    '<svg viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="24" fill="var(--t-camp)" stroke="var(--t-camp-i)" stroke-width="3"/><path d="M6 21c13 5 31 5 44 0M6 35c13-5 31-5 44 0M28 4c-9 10-9 38 0 48" fill="none" stroke="var(--t-camp-i)" stroke-width="2.5"/></svg>',
+    '<svg viewBox="0 0 56 56" aria-hidden="true"><path d="M17 5 23 3Q28 9 33 3L39 5 53 17 46 27 40 23V53H16V23L10 27 3 17Z" fill="var(--t-mer)" stroke="var(--t-mer-i)" stroke-width="3" stroke-linejoin="round"/></svg>',
+    '<svg viewBox="0 0 64 44" aria-hidden="true"><rect x="3" y="3" width="58" height="38" fill="var(--t-ville)" stroke="var(--t-ville-i)" stroke-width="3"/><path d="M3 15.7h58M3 28.3h58M17.5 3v38M32 3v38M46.5 3v38" stroke="var(--t-ville-i)" stroke-width="1.5"/></svg>',
+    '<svg viewBox="0 0 56 56" aria-hidden="true"><rect x="9" y="5" width="38" height="48" rx="4" fill="var(--t-mont)" stroke="var(--t-mont-i)" stroke-width="3"/><path d="M19 5h18v7H19zM17 24h22M17 33h22M17 42h12" fill="none" stroke="var(--t-mont-i)" stroke-width="3" stroke-linejoin="round"/></svg>']
+};
+
+// ------------------------------------------------------------------ utilitaires
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const fmt = n => Number(n).toLocaleString('fr-FR');
+const norm = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[-'’]/g, ' ');
+const rnd = n => Math.floor(Math.random() * n);
+function sampleDistinct(start, count, k) { const out = new Set(); k = Math.min(k, count); while (out.size < k) out.add(start + rnd(count)); return [...out]; }
+function dms(v, pos, neg) { const h = v >= 0 ? pos : neg; v = Math.abs(v); let d = Math.floor(v), m = Math.round((v - d) * 60); if (m === 60) { d++; m = 0; } return `${d}°${String(m).padStart(2, '0')}′ ${h}`; }
+let toastTimer;
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => t.hidden = true, 2600); }
+
+// ------------------------------------------------------------------ connexion Supabase
+const SB_URL = 'https://zxhngixdldnsffdxcncz.supabase.co';
+const SB_KEY = 'sb_publishable_tpdQNrcnnDaJIO3TaWPZ_Q_c3F8PULJ';
+const EMAIL_DOMAIN = 'joueurs.cartes-hblm.app';
+const SEASON = '2026-2027';
+const sb = window.supabase.createClient(SB_URL, SB_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storageKey: 'cartes-hblm-auth' } });
+const slugOf = p => p.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+const ERR = { no_stock: 'Plus de booster en réserve.', no_coins: 'Pas assez de pièces.', no_dup: 'Il te faut cette carte en double.', gone: 'Cette offre n’est plus disponible.', own_offer: 'C’est ta propre offre.', owned: 'Tu as déjà cette carte.', too_many: '10 offres en cours au maximum.', same_card: 'Choisis une carte différente.', bad_team: 'Équipe trop petite pour un booster.', not_member: 'Compte introuvable, reconnecte-toi.' };
+function errMsg(e) {
+  const m = String((e && (e.message || e.error)) || '');
+  for (const k in ERR) if (m.includes(k)) return ERR[k];
+  if (/fetch|network|load failed/i.test(m)) return 'Pas de connexion. Réessaie quand tu as du réseau.';
+  return 'Une erreur est survenue, réessaie.';
+}
+async function rpc(fn, args) { const { data, error } = await sb.rpc(fn, args || {}); if (error) throw error; return data; }
+const typing = () => { const a = document.activeElement; return !!a && /^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName); };
+
+// ------------------------------------------------------------------ données (chargées après connexion : seuls les membres du club voient les noms)
+let C = null, N = 0, depOf, uid = null;
+async function loadCards() {
+  const [cr, tr] = await Promise.all([
+    sb.from('cards').select('id,nom,team,t,r,sx,fid,lat,s').order('id'),
+    sb.from('teams').select('id,name,code,grp,t,s,k').order('id')]);
+  if (cr.error) throw cr.error; if (tr.error) throw tr.error;
+  if (!cr.data.length) throw new Error('not_member');
+  const X = { nom: [], t: [], r: [], sx: [], fid: [], lat: [], s: [], season: SEASON, deps: tr.data.map(t => ({ c: t.code, n: t.name, reg: t.grp, s: t.s, k: t.k })) };
+  for (const c of cr.data) { X.nom[c.id] = c.nom; X.t[c.id] = c.t; X.r[c.id] = c.r; X.sx[c.id] = c.sx; X.fid[c.id] = c.fid; X.lat[c.id] = c.lat; for (let k = 0; k < 5; k++) X.s[c.id * 5 + k] = c.s[k]; }
+  C = X; N = C.nom.length;
+  C.code = C.nom.map((_, i) => String(i + 1).padStart(3, '0'));
+  depOf = new Uint8Array(N); for (const c of cr.data) depOf[c.id] = c.team;
+  C.normNames = C.nom.map(norm);
+  computePrices();
+}
+const stat = (i, k) => C.s[i * 5 + k];
+const stats = i => C.s.slice(i * 5, i * 5 + 5);
+
+// ------------------------------------------------------------------ état du joueur (la vérité est sur le serveur)
+let S = null, skew = 0;
+const now = () => Date.now() + skew;
+function applyState(o) {
+  const counts = new Uint8Array(N); for (const k in o.counts) if (+k < N) counts[+k] = Math.min(255, o.counts[k]);
+  skew = Date.parse(o.now) - Date.now();
+  S = { admin: !!o.admin, pseudo: o.pseudo, coins: o.coins, frags: o.frags, stock: o.stock, stockTs: Date.parse(o.stock_ts), opened: o.opened, trades: o.trades, counts };
+  const news = (o.news || []).filter(n => n.want < N);
+  if (news.length === 1) toast(`Échange conclu avec ${news[0].taker || 'un joueur'} : ${C.nom[news[0].want]} rejoint ta collection`);
+  else if (news.length > 1) toast(`${news.length} de tes offres d’échange ont été acceptées`);
+}
+async function refreshState(quiet) {
+  try {
+    applyState(await rpc('my_state'));
+    await loadPhotoList();
+    if ($('#overlay').hidden && !state.busy && !typing()) render(); else setWallet();
+  } catch (e) { if (!quiet) toast(errMsg(e)); }
+}
+function tickStock() { if (!S) return; while (S.stock < STOCK_MAX && now() - S.stockTs >= BOOSTER_MS) { S.stock++; S.stockTs += BOOSTER_MS; } }
+function nextIn() { return S.stock >= STOCK_MAX ? 0 : BOOSTER_MS - (now() - S.stockTs); }
+function mmss(ms) { const s = Math.max(0, Math.ceil(ms / 1000)); return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; }
+// favoris : simple confort, gardé sur cet appareil
+let FAV = new Set();
+const favKey = () => 'cartes-hblm-fav-' + uid;
+function loadFavs() { try { FAV = new Set(JSON.parse(localStorage.getItem(favKey()) || '[]')); } catch (e) { FAV = new Set(); } }
+function saveFavs() { try { localStorage.setItem(favKey(), JSON.stringify([...FAV])); } catch (e) {} }
+const isFav = i => FAV.has(i);
+
+// ------------------------------------------------------------------ photos des cartes (stockées dans la base, visibles des seuls membres)
+const PHOTO = new Map(); let HAS_PHOTO = new Map(); // id -> version (updated_at)
+const PHOTO_CACHE = 'cartes-hblm-photos';
+async function loadPhotoList() {
+  const { data, error } = await sb.from('card_photos').select('card_id,updated_at');
+  if (error) return;
+  const next = new Map(data.map(d => [d.card_id, d.updated_at]));
+  for (const [i, v] of HAS_PHOTO) if (next.get(i) !== v) PHOTO.delete(i); // photo changée ou retirée
+  HAS_PHOTO = next;
+}
+const photoKey = i => `https://photos.cartes-hblm.invalid/${i}?v=${encodeURIComponent(HAS_PHOTO.get(i) || '')}`;
+async function cacheGet(i) { try { const c = await caches.open(PHOTO_CACHE); const r = await c.match(photoKey(i)); return r ? await r.text() : null; } catch (e) { return null; } }
+async function cachePut(i, d) { try { const c = await caches.open(PHOTO_CACHE); await c.put(photoKey(i), new Response(d)); } catch (e) {} }
+function artHTML(i, cls) { return HAS_PHOTO.has(i) ? `<img class="photo" data-ph="${i}" alt=""${PHOTO.has(i) ? ` src="${PHOTO.get(i)}"` : ''}>` : topoSvg() + jersey(i, cls); }
+function silHTML(i) { return HAS_PHOTO.has(i) ? `<img class="photo" data-ph="${i}" alt=""${PHOTO.has(i) ? ` src="${PHOTO.get(i)}"` : ''}>` : jersey(i); }
+let photoBusy = false, photoAgain = false;
+async function fillPhotos() {
+  if (photoBusy) { photoAgain = true; return; } photoBusy = true;
+  try {
+    const els = [...document.querySelectorAll('img[data-ph]:not([src])')];
+    const need = [...new Set(els.map(e => +e.dataset.ph))].filter(i => !PHOTO.has(i) && HAS_PHOTO.has(i));
+    const miss = [];
+    for (const i of need) { const d = await cacheGet(i); if (d) PHOTO.set(i, d); else miss.push(i); }
+    if (miss.length) {
+      const { data } = await sb.from('card_photos').select('card_id,img').in('card_id', miss);
+      for (const p of data || []) { PHOTO.set(p.card_id, p.img); cachePut(p.card_id, p.img); }
+    }
+    document.querySelectorAll('img[data-ph]:not([src])').forEach(e => { const d = PHOTO.get(+e.dataset.ph); if (d) e.src = d; });
+  } catch (e) {}
+  photoBusy = false;
+  if (photoAgain) { photoAgain = false; fillPhotos(); }
+}
+let photoRaf = 0;
+new MutationObserver(() => { if (!photoRaf) photoRaf = requestAnimationFrame(() => { photoRaf = 0; if (document.querySelector('img[data-ph]:not([src])')) fillPhotos(); }); }).observe(document.documentElement, { childList: true, subtree: true });
+// photo choisie par l'administrateur : recadrée en 4:3 (visage vers le haut), compressée sur le téléphone avant l'envoi
+async function makePhoto(file) {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = url; });
+    const W = 720, H = 540, s = Math.max(W / img.naturalWidth, H / img.naturalHeight);
+    const sw = W / s, sh = H / s, sx = (img.naturalWidth - sw) / 2, sy = (img.naturalHeight - sh) * 0.3;
+    const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+    cv.getContext('2d').drawImage(img, sx, sy, sw, sh, 0, 0, W, H);
+    let d = cv.toDataURL('image/webp', 0.62); if (!d.startsWith('data:image/webp')) d = cv.toDataURL('image/jpeg', 0.72);
+    return d;
+  } finally { URL.revokeObjectURL(url); }
+}
+
+// ------------------------------------------------------------------ rendu des cartes
+// terrain de hand vu de dessus (but à gauche, zone des 6 m, ligne des 9 m en pointillés)
+function topoSvg(cls = '') {
+  return `<svg class="${cls}" viewBox="0 0 318 178" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><g fill="none" stroke="var(--tl)" stroke-width="1.6"><path d="M6 6H312V172H6Z"/><path d="M246 6V172"/><path d="M6 -1A72 72 0 0 1 78 71V107A72 72 0 0 1 6 179" stroke-width="2.2"/><path d="M6 -37A108 108 0 0 1 114 71V107A108 108 0 0 1 6 215" stroke-dasharray="7 6"/><path d="M90 83V95M54 86V92"/></g><path d="M0 71H6V107H0" fill="none" stroke="var(--tl)" stroke-width="4"/></svg>`;
+}
+const initials = nm => { const p = nm.split(' '); const last = p.filter(w => w === w.toUpperCase() && /[A-Z]/.test(w)); const first = p.filter(w => !last.includes(w)); return ((first[0] || p[0])[0] + ((last[0] || p[p.length - 1])[0] || '')).toUpperCase(); };
+function jersey(i, cls = '') {
+  return `<svg class="${cls}" viewBox="0 0 100 100" aria-hidden="true"><path d="M30 12 42 8Q50 17 58 8L70 12 91 29 81 45 72 39V93H28V39L19 45 9 29Z" fill="var(--ti)" stroke="var(--card-ink)" stroke-width="2.4" stroke-linejoin="round"/><path d="M42 8Q50 17 58 8" fill="none" stroke="var(--card-paper)" stroke-width="3"/><path d="M28 39V93M72 39V93" stroke="var(--card-paper)" stroke-width="2" opacity=".35"/><text x="50" y="70" text-anchor="middle" font-family="Barlow Condensed, Arial Narrow, sans-serif" font-weight="700" font-size="30" fill="var(--card-paper)">${esc(initials(C.nom[i]))}</text></svg>`;
+}
+function flavor(i) {
+  const f = C.sx[i] === 'F', e = f ? 'e' : '';
+  const a = C.t[i] === 3 ? `Dirigeant${e} du club : sans les bénévoles, pas de match le week-end.` : ['Nouvelle recrue de la saison.', 'Fidèle au club : licence renouvelée cette saison.', `Arrivé${e} au club par mutation cette saison.`][C.fid[i]];
+  const b = C.lat[i] === 1 ? (f ? ' Gauchère : une main précieuse sur l’aile droite.' : ' Gaucher : une main précieuse sur l’aile droite.') : C.lat[i] === 2 ? ' Ambidextre : tire des deux mains.' : '';
+  return a + b;
+}
+const latLabel = i => C.lat[i] === 1 ? (C.sx[i] === 'F' ? 'Gauchère' : 'Gaucher') : C.lat[i] === 2 ? 'Ambidextre' : '';
+function cardHTML(i, det, opts = {}) {
+  const t = C.t[i], r = C.r[i], st = stats(i), best = Math.max(...st);
+  const nm = C.nom[i]; const nmc = nm.length > 22 ? 'xl' : nm.length > 14 ? 'l' : '';
+  const total = st.reduce((a, b) => a + b, 0), lt = latLabel(i);
+  return `<div class="card r${r} t${t}${opts.ghost ? ' ghost' : ''}" style="${opts.cw ? `--cw:${opts.cw}` : ''}" role="img" aria-label="${esc(nm)}, ${RAR_NAMES[r]}, ${TYPE_NAMES[t]}"><div class="in">
+    <div class="hd"><span class="no">N° ${esc(C.code[i])}</span><span class="pill">${RAR_MARK[r]}${RAR_NAMES[r]}</span></div>
+    <h4 class="nm ${nmc}">${esc(nm)}</h4>
+    <div class="sub"><span>${esc(C.deps[depOf[i]].n)}</span><span>Saison ${esc(SEASON.replace('-20', '-'))}</span></div>
+    <div class="art">${artHTML(i, 'jer')}${lt ? `<span class="lat">${lt}</span>` : ''}<span class="ttag">${ICON.type[t].replace('<svg', '<svg width="12" height="12"')}${TYPE_NAMES[t]}</span></div>
+    <div class="stats${opts.hl != null ? ' hashl' : ''}">${st.map((v, k) => `<div class="st${v === best ? ' best' : ''}${opts.hl === k ? ' hl' : ''}">${ICON.st[k]}<span class="lb">${STAT_NAMES[k]}</span><span class="bar"><i style="width:${v}%"></i></span><span class="v">${v}</span></div>`).join('')}</div>
+    <p class="an">${esc(flavor(i))}</p>
+    <div class="ft"><span>HBLM · ${esc(C.deps[depOf[i]].c)}</span><span>Budget ${total}</span></div>
+  </div></div>`;
+}
+// dos : terrain vu de dessus, but en haut et en bas
+function backHTML(t, cw) {
+  return `<div class="back t${t}" style="${cw ? `--cw:${cw}` : ''}"><div class="in">
+    <svg class="topo" viewBox="0 0 342 486" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><g fill="none" stroke="var(--tl)" stroke-width="2"><path d="M14 14H328V472H14Z"/><path d="M14 243H328"/><path d="M81 14A72 72 0 0 0 153 86H189A72 72 0 0 0 261 14" stroke-width="2.6"/><path d="M45 14A108 108 0 0 0 153 122H189A108 108 0 0 0 297 14" stroke-dasharray="9 7"/><path d="M81 472A72 72 0 0 1 153 400H189A72 72 0 0 1 261 472" stroke-width="2.6"/><path d="M45 472A108 108 0 0 1 153 364H189A108 108 0 0 1 297 472" stroke-dasharray="9 7"/><path d="M159 98H183M159 388H183"/></g></svg>
+    <div class="band t">HANDBALL · HBLM</div>
+    <div class="emb">${ICON.big[t]}<b>${BACK_NAMES[t]}</b></div>
+    <div class="band b">SÉRIE 1 · SAISON ${esc(SEASON.replace('-20', '-'))}</div>
+  </div></div>`;
+}
+function silSvg(x) { return typeof x === 'number' ? jersey(x) : ''; }
+// ------------------------------------------------------------------ état de l'interface
+const state = { tab: 'booster', dep: null, f: { r: -1, t: -1, s: 'own', sort: 'nom' }, limit: 60, query: '', reveal: null, cmode: 'cards', page: 0, showF: false,
+  tradeTab: 'offres', offers: [], offersAt: 0, offersLoaded: false, offersErr: false, offerDraft: null, busy: false, regDep: null, regOpen: false, packType: null, authMode: 'login' };
+const RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+const wait = ms => new Promise(r => setTimeout(r, RM ? 0 : ms));
+function bump(el) { if (!el) return; el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); }
+let lastW = null, enterT;
+function setWallet() {
+  if (!S) return;
+  const c = $('#coins'), f = $('#frags');
+  if (lastW && S.coins !== lastW.c) bump(c.parentNode);
+  if (lastW && S.frags !== lastW.f) bump(f.parentNode);
+  if (lastW && S.stock !== lastW.s) bump($('#stockdot'));
+  lastW = { c: S.coins, f: S.frags, s: S.stock };
+  c.textContent = fmt(S.coins); f.textContent = fmt(S.frags); const d = $('#stockdot'); d.hidden = S.stock < 1; d.textContent = S.stock;
+}
+function animEnter() { const m = $('#main'); m.classList.remove('enter'); void m.offsetWidth; m.classList.add('enter'); clearTimeout(enterT); enterT = setTimeout(() => m.classList.remove('enter'), 1000); }
+function setTab(t) {
+  state.tab = t; document.querySelectorAll('nav.tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === t)));
+  if (t === 'echanges') loadOffers();
+  $('#main').scrollTop = 0; render(); animEnter();
+}
+function render() {
+  if (!S || !C) return;
+  setWallet();
+  const m = $('#main');
+  if (state.tab === 'booster') m.innerHTML = viewBooster();
+  else if (state.tab === 'collection') {
+    if (state.dep !== null) { m.innerHTML = viewDep(); fillDep(); }
+    else if (state.cmode === 'deps') m.innerHTML = viewCollection();
+    else m.innerHTML = viewCards();
+  }
+  else if (state.tab === 'echanges') m.innerHTML = viewTrades();
+  else m.innerHTML = viewProfil();
+}
+const owned = () => { let n = 0; for (let i = 0; i < N; i++) if (S.counts[i]) n++; return n; };
+
+// ------------------------------------------------------------------ filtres de collection
+const fActive = () => state.f.r >= 0 || state.f.t >= 0 || state.f.s !== 'all';
+function matches(i) {
+  const f = state.f, c = S.counts[i];
+  if (f.r >= 0 && C.r[i] !== f.r) return false;
+  if (f.t >= 0 && C.t[i] !== f.t) return false;
+  if (f.s === 'own' && !c) return false; if (f.s === 'miss' && c) return false; if (f.s === 'dup' && c < 2) return false;
+  if (f.s === 'fav' && !isFav(i)) return false;
+  return true;
+}
+function sortIds(ids) {
+  const k = state.f.sort;
+  if (k === 'rar') ids.sort((a, b) => C.r[b] - C.r[a] || C.nom[a].localeCompare(C.nom[b], 'fr'));
+  else if (k[0] === 's') { const s = Number(k.slice(1)); ids.sort((a, b) => stat(b, s) - stat(a, s) || C.r[b] - C.r[a] || C.nom[a].localeCompare(C.nom[b], 'fr')); }
+  else ids.sort((a, b) => C.nom[a].localeCompare(C.nom[b], 'fr'));
+  return ids;
+}
+function filtersHTML() {
+  const f = state.f;
+  const grp = (label, key, opts) => `<div class="fgrp"><span class="flb">${label}</span><div class="seg" role="group" aria-label="${label}">${opts.map(([v, l, cls]) => `<button data-act="setf" data-k="${key}" data-v="${v}" aria-pressed="${String(f[key]) === String(v)}">${cls ? `<span class="chip ${cls}"></span>` : ''}${l}</button>`).join('')}</div></div>`;
+  return `<div class="panel filters">
+    ${grp('Statut', 's', [['own', 'Possédées'], ['all', 'Toutes'], ['miss', 'Manquantes'], ['dup', 'Doublons'], ['fav', '★ Favoris']])}
+    ${grp('Rareté', 'r', [[-1, 'Toutes'], ...RAR_NAMES.map((n, k) => [k, n, 'r' + k])])}
+    ${grp('Type', 't', [[-1, 'Tous'], ...TYPE_NAMES.map((n, k) => [k, n])])}
+    ${grp('Trier par', 'sort', [['nom', 'Nom'], ['rar', 'Rareté'], ...STAT_NAMES.map((n, k) => ['s' + k, n])])}
+    ${fActive() ? '<button class="btn ghost sm" data-act="resetf">Effacer les filtres</button>' : ''}
+  </div>`;
+}
+const STAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z" fill="currentColor" style="fill-opacity: var(--fo, 0)" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+const RAR_SHORT = ['C', 'PC', 'R', 'É', 'L'];
+function gcHTML(i, o = {}) {
+  const c = S.counts[i], st = stats(i); const top = [0, 1, 2, 3, 4].sort((a, b) => st[b] - st[a]).slice(0, 2);
+  return `<button class="gc r${C.r[i]} t${C.t[i]}${o.miss ? ' miss' : ''}" data-act="see" data-i="${i}" aria-label="${esc(C.nom[i])}, ${RAR_NAMES[C.r[i]]}">
+    <div class="ga">${artHTML(i, 'gs')}
+      <span class="rk">${RAR_SHORT[C.r[i]]}</span>
+      <span class="star${isFav(i) ? ' on' : ''}" data-act="fav" data-i="${i}" role="button" aria-label="${isFav(i) ? 'Retirer des favoris' : 'Ajouter aux favoris'}" style="--fo:${isFav(i) ? 1 : 0}">${STAR}</span>
+      ${c > 1 ? `<span class="xn">×${c}</span>` : ''}</div>
+    <div class="gb"><span class="gn">${esc(C.nom[i])}</span><span class="gd">${esc(C.deps[depOf[i]].n)} · ${TYPE_NAMES[C.t[i]]}</span>
+      <span class="gst">${top.map(k => `<span>${ICON.st[k]}${st[k]}</span>`).join('')}</span></div></button>`;
+}
+function pagerHTML(page, pages) {
+  if (pages <= 1) return '';
+  return `<div class="pager"><button class="btn ghost" data-act="page" data-v="${page - 1}" ${page <= 0 ? 'disabled' : ''} aria-label="Page précédente">←</button><span>Page ${page + 1} / ${pages}</span><button class="btn ghost" data-act="page" data-v="${page + 1}" ${page >= pages - 1 ? 'disabled' : ''} aria-label="Page suivante">→</button></div>`;
+}
+const PER_PAGE = 20;
+function recyclePreview() { let coins = 0, frags = 0, n = 0; for (let i = 0; i < N; i++) { const c = S.counts[i]; if (c > 1) { n += c - 1; if (C.r[i] === 4) frags += c - 1; else coins += (c - 1) * RECYCLE[C.r[i]]; } } return { coins, frags, n }; }
+function viewCards() {
+  const own = owned(), q = state.query.trim(), nq = norm(q);
+  const hits = []; for (let i = 0; i < N; i++) if ((q.length < 2 || C.normNames[i].includes(nq)) && matches(i)) hits.push(i);
+  if (q.length >= 2 && state.f.sort === 'nom') hits.sort((a, b) => (C.normNames[b].startsWith(nq) - C.normNames[a].startsWith(nq)) || C.nom[a].localeCompare(C.nom[b], 'fr')); else sortIds(hits);
+  const pages = Math.max(1, Math.ceil(hits.length / PER_PAGE)); state.page = Math.min(state.page, pages - 1);
+  const shown = hits.slice(state.page * PER_PAGE, (state.page + 1) * PER_PAGE);
+  const rp = recyclePreview();
+  return `<div class="view">
+    <div class="head"><h2>Collection</h2></div>
+    <div class="tabsub" role="tablist"><button role="tab" data-act="cmode" data-v="cards" aria-selected="true">Mes cartes · ${fmt(own)}</button><button role="tab" data-act="cmode" data-v="deps" aria-selected="false">Équipes</button></div>
+    <input type="search" id="q" placeholder="Rechercher un joueur, une joueuse…" value="${esc(state.query)}" autocomplete="off" aria-label="Rechercher par nom">
+    <div class="row" style="justify-content:space-between"><div class="rchips" role="group" aria-label="Rareté">${[4, 3, 2, 1, 0].map(r => `<button class="r${r}" data-act="setf" data-k="r" data-v="${state.f.r === r ? -1 : r}" aria-pressed="${state.f.r === r}" title="${RAR_NAMES[r]}">${RAR_SHORT[r]}</button>`).join('')}</div>
+      <button class="btn ghost sm" data-act="togglef">${state.showF ? 'Masquer' : 'Filtres'}</button></div>
+    ${state.showF ? filtersHTML() : ''}
+    <div class="row" style="justify-content:space-between"><h3>${fmt(hits.length)} carte${hits.length > 1 ? 's' : ''}</h3>${rp.n ? `<button class="btn ghost sm" data-act="recycle">Recycler ${fmt(rp.n)} doublon${rp.n > 1 ? 's' : ''} · +${fmt(rp.coins)}</button>` : ''}</div>
+    ${pagerHTML(state.page, pages)}
+    <div class="grid2">${shown.map(i => gcHTML(i, { miss: !S.counts[i] })).join('') || `<p class="muted">${own ? 'Aucune carte ne correspond.' : 'Ta collection est vide : ouvre ton premier booster !'}</p>`}</div>
+    ${pagerHTML(state.page, pages)}
+  </div>`;
+}
+function depProgress(j) { const d = C.deps[j]; let n = 0; for (let i = d.s; i < d.s + d.k; i++) if (S.counts[i]) n++; return n; }
+function viewCollection() {
+  const own = owned(), rp = recyclePreview();
+  const regions = {}; C.deps.forEach((d, j) => (regions[d.reg] = regions[d.reg] || []).push(j));
+  return `<div class="view">
+    <div class="head"><h2>Collection</h2></div>
+    <div class="tabsub" role="tablist"><button role="tab" data-act="cmode" data-v="cards" aria-selected="false">Mes cartes · ${fmt(own)}</button><button role="tab" data-act="cmode" data-v="deps" aria-selected="true">Équipes</button></div>
+    <div class="panel">
+      <div class="row" style="justify-content:space-between"><h2 class="num">${fmt(own)} <span class="muted" style="font-size:18px">/ ${fmt(N)}</span></h2><span class="muted num">${(own / N * 100).toFixed(1).replace('.', ',')} %</span></div>
+      <div class="prog"><i style="width:${own / N * 100}%"></i></div>
+      <div class="row" style="justify-content:space-between"><span class="small muted">${fmt(rp.n)} doublon${rp.n > 1 ? 's' : ''} : +${fmt(rp.coins)} pièces${rp.frags ? ', +' + rp.frags + ' fragment' + (rp.frags > 1 ? 's' : '') : ''}</span>
+      <button class="btn sm" data-act="recycle" ${rp.n ? '' : 'disabled'}>Recycler</button></div>
+    </div>
+    ${Object.entries(regions).map(([reg, js]) => `<section class="region"><h3>${esc(reg)}</h3>${js.map(j => { const d = C.deps[j], p = depProgress(j); return `<button class="dep" data-act="dep" data-j="${j}"><span class="code${p === d.k ? ' full' : ''}">${esc(d.c)}</span><span class="nm"><span>${esc(d.n)}</span><span class="prog"><i style="width:${p / d.k * 100}%"></i></span></span><span class="ct">${p}/${d.k}</span></button>`; }).join('')}</section>`).join('')}
+  </div>`;
+}
+function viewDep() {
+  const j = state.dep, d = C.deps[j], p = depProgress(j);
+  return `<div class="view">
+    <div class="row"><button class="btn ghost sm" data-act="back" aria-label="Retour à la liste">← Équipes</button></div>
+    <div class="panel">
+      <div class="row" style="justify-content:space-between;align-items:flex-start"><h2>${esc(d.n)}</h2><span class="dep" style="width:auto;padding:0;border:0"><span class="code${p === d.k ? ' full' : ''}">${esc(d.c)}</span></span></div>
+      <div class="row" style="justify-content:space-between"><span class="muted num">${p} / ${d.k} cartes</span><span class="muted num">${Math.round(p / d.k * 100)} %</span></div>
+      <div class="prog"><i style="width:${p / d.k * 100}%"></i></div>
+    </div>
+    ${filtersHTML()}
+    <h3 id="tilecount"></h3>
+    <div class="tiles" id="tiles"></div>
+  </div>`;
+}
+function fillDep() {
+  const j = state.dep, d = C.deps[j];
+  const ids = []; for (let k = 0; k < d.k; k++) if (matches(d.s + k)) ids.push(d.s + k);
+  sortIds(ids);
+  $('#tilecount').textContent = `${fmt(ids.length)} carte${ids.length > 1 ? 's' : ''}`;
+  $('#tiles').innerHTML = ids.map(i => { const c = S.counts[i]; return `<button class="tile r${C.r[i]} t${C.t[i]}${c ? '' : ' miss'}" data-act="see" data-i="${i}"><div class="sil">${silHTML(i)}</div><div class="tn">${esc(C.nom[i])}</div>${state.f.sort[0] === 's' ? `<div class="tv num">${STAT_NAMES[+state.f.sort.slice(1)].slice(0, 5)}. ${stat(i, +state.f.sort.slice(1))}</div>` : ''}<div class="rb"></div>${c > 1 ? `<span class="x">×${c}</span>` : ''}</button>`; }).join('') || '<p class="muted">Aucune carte dans ce filtre.</p>';
+}
+function showCard(i) {
+  const ov = $('#overlay'); ov.hidden = false;
+  const c = S.counts[i], r = C.r[i];
+  const needF = r === 4 ? CRAFT_FRAGS : 0, cost = CRAFT[r];
+  const canCraft = !c && S.coins >= cost && S.frags >= needF;
+  ov.innerHTML = `<div class="sheet">
+    ${cardHTML(i, null, { ghost: !c, cw: 'min(320px, 84vw, calc((100vh - 260px) * 5 / 7))' })}
+    <div class="row" style="justify-content:center">${c ? `<span class="badge new">${c > 1 ? 'Possédée ×' + c : 'Possédée'}</span>` : '<span class="badge dup">Pas encore trouvée</span>'}</div>
+    <div class="acts">
+      ${!c ? `<button class="btn accent" data-act="craft" data-i="${i}" ${canCraft ? '' : 'disabled'}>Fabriquer · ${fmt(cost)} pièces${needF ? ' + ' + needF + ' fragments' : ''}</button>
+        <button class="btn ghost" data-act="wantthis" data-i="${i}">La demander en échange</button>` : ''}
+      ${c > 1 ? `<button class="btn" data-act="givethis" data-i="${i}">Proposer en échange</button>
+        <button class="btn ghost" data-act="recycle1" data-i="${i}">Recycler 1 doublon · +${r === 4 ? '1 fragment' : RECYCLE[r] + ' pièce' + (RECYCLE[r] > 1 ? 's' : '')}</button>` : ''}
+      ${S.admin ? `<label class="btn ghost">${HAS_PHOTO.has(i) ? 'Changer la photo' : 'Ajouter une photo'}<input type="file" accept="image/*" data-photo="${i}" hidden></label>
+        ${HAS_PHOTO.has(i) ? `<button class="btn ghost" data-act="delphoto" data-i="${i}">Retirer la photo</button>` : ''}
+        <p class="small muted center">Admin : choisis une photo où seul ce licencié est reconnaissable.</p>` : ''}
+      <button class="btn ghost" data-act="closeov">Fermer</button>
+    </div></div>`;
+}
+const uploadPhoto = (i, file) => busyRun(async () => {
+  toast('Envoi de la photo…');
+  const d = await makePhoto(file);
+  await rpc('set_card_photo', { p_card: i, p_img: d });
+  await loadPhotoList(); PHOTO.set(i, d); cachePut(i, d);
+  toast(`Photo de ${C.nom[i]} enregistrée`); showCard(i);
+});
+const deletePhoto = i => busyRun(async () => { await rpc('delete_card_photo', { p_card: i }); await loadPhotoList(); PHOTO.delete(i); toast('Photo retirée'); showCard(i); });
+async function busyRun(fn) {
+  if (state.busy) return; state.busy = true;
+  try { await fn(); } catch (e) { toast(errMsg(e)); }
+  state.busy = false;
+}
+const recycleToast = r => toast(`Doublons recyclés : +${fmt(r.coins)} pièce${r.coins > 1 ? 's' : ''}${r.frags ? ', +' + r.frags + ' fragment' + (r.frags > 1 ? 's' : '') : ''}`);
+const recycleAll = () => busyRun(async () => { const r = await rpc('recycle', { p_card: null }); recycleToast(r); applyState(await rpc('my_state')); render(); });
+const recycle1 = i => busyRun(async () => { const r = await rpc('recycle', { p_card: i }); recycleToast(r); applyState(await rpc('my_state')); showCard(i); });
+const craft = i => busyRun(async () => { await rpc('craft', { p_card: i }); toast(`${C.nom[i]} rejoint ta collection`); applyState(await rpc('my_state')); showCard(i); });
+
+// ------------------------------------------------------------------ BOOSTER
+const STANDALONE = () => (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+const IS_IOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+let deferredInstall = null;
+function installHint() { try { if (STANDALONE() || localStorage.getItem('cartes-hblm-nohint')) return ''; } catch (e) { if (STANDALONE()) return ''; }
+  return `<div class="hint"><span>Installe l’appli sur ton téléphone pour l’ouvrir comme un jeu.</span><button class="btn sm accent" data-act="gotab" data-t="profil">Comment ?</button><button class="x" data-act="nohint" aria-label="Masquer">✕</button></div>`; }
+function regMix(j) { const d = C.deps[j]; const n = [0, 0, 0, 0, 0]; for (let i = d.s; i < d.s + d.k; i++) n[C.r[i]]++; const rare = n[2] + n[3] + n[4]; return `${d.k} cartes, dont ${rare} rare${rare > 1 ? 's' : ''} ou mieux (${Math.round(rare / d.k * 100)} %)${n[4] ? ' et ' + n[4] + ' légendaire' + (n[4] > 1 ? 's' : '') : ''}.`; }
+function viewBooster() {
+  tickStock();
+  const deps = C.deps.map((d, j) => [d, j]).filter(([d]) => d.k >= CARDS_PER_BOOSTER);
+  const rj = state.regDep ?? deps[0][1];
+  return `<div class="view packs">
+    ${installHint()}
+    <div class="lead"><h2 class="center" style="font-size:34px">Ouvrir un booster</h2><p class="muted center">5 licenciés du club par booster</p></div>
+    <button class="bigpack" data-act="open" ${S.stock < 1 ? 'disabled' : ''} aria-label="Ouvrir un booster">${backHTML(state.packType ?? (state.packType = rnd(4)))}</button>
+    <button class="btn accent" style="min-width:200px" data-act="open" ${S.stock < 1 ? 'disabled' : ''}>Ouvrir</button>
+    <div class="stockbox"><span class="big"><b>${S.stock}</b> / ${STOCK_MAX}</span><span class="muted">boosters disponibles</span><span class="muted num" id="countdown">${S.stock >= STOCK_MAX ? 'Réserve pleine' : 'Prochain dans ' + mmss(nextIn())}</span></div>
+    <details class="panel"${state.regOpen ? ' open' : ''} id="regbox">
+      <summary>Booster équipe</summary>
+      <p class="small muted">5 cartes différentes de l'équipe choisie.</p>
+      <label class="small" for="regdep">Équipe</label>
+      <select id="regdep">${deps.map(([d, j]) => `<option value="${j}" ${rj === j ? 'selected' : ''}>${esc(d.n)} · ${regPrice(j)} pièces</option>`).join('')}</select>
+      <p class="small muted" id="regmix">${regMix(rj)}</p>
+      <button class="btn wide" id="regbtn" data-act="openreg" ${S.coins < regPrice(rj) ? 'disabled' : ''}>Acheter · ${regPrice(rj)} pièces</button>
+      <p class="small muted">Le prix dépend de la valeur des cartes de l'équipe : plus il y a de cartes rares, plus le booster est cher. Gagne des pièces en recyclant tes doublons.</p>
+    </details>
+    <p class="small muted center">Un booster gratuit toutes les 10 minutes, jusqu'à 10 en réserve. Plus une carte est rare, moins elle sort souvent.<br>${fmt(S.opened)} boosters ouverts · ${fmt(owned())} cartes sur ${fmt(N)}</p>
+  </div>`;
+}
+async function openBooster(regional) {
+  if (state.busy) return;
+  let j = null, label = 'Booster';
+  if (regional) { j = Number($('#regdep').value); state.regDep = j; label = C.deps[j].n; if (S.coins < regPrice(j)) return; }
+  else { tickStock(); if (S.stock < 1) return; }
+  state.busy = true;
+  const ov = $('#overlay'); ov.hidden = false;
+  ov.innerHTML = `<div class="pack" aria-label="Ouverture du booster"><div class="packin">${backHTML(regional ? C.t[C.deps[j].s] : [3, 1, 2, 0][rnd(4)])}</div><span class="packlbl">${esc(label)} · ${CARDS_PER_BOOSTER} cartes</span></div>`;
+  let res;
+  try { [res] = await Promise.all([rpc('open_booster', { p_team: j }), wait(1100)]); }
+  catch (e) { state.busy = false; ov.hidden = true; toast(errMsg(e)); refreshState(true); return; }
+  const ids = res.map(x => x.id).filter(i => i < N), fresh = res.filter(x => x.id < N).map(x => x.new);
+  ids.forEach(i => { if (S.counts[i] < 255) S.counts[i]++; });
+  if (regional) S.coins -= regPrice(j); else { if (S.stock >= STOCK_MAX) S.stockTs = now(); S.stock--; }
+  S.opened++; setWallet();
+  state.reveal = { ids, fresh, k: 0, open: false };
+  const pk = $('.pack'); if (pk) pk.classList.add('torn');
+  await wait(380);
+  state.busy = false;
+  drawReveal();
+}
+function drawReveal() {
+  const R = state.reveal, ov = $('#overlay');
+  if (R.k >= R.ids.length) {
+    const nNew = R.fresh.filter(Boolean).length;
+    ov.innerHTML = `<h2>${nNew} nouvelle${nNew > 1 ? 's' : ''} carte${nNew > 1 ? 's' : ''}</h2>
+      <div class="sumgrid">${R.ids.map((i, k) => `<button class="tile r${C.r[i]} t${C.t[i]}" style="--k:${k}" data-act="see" data-i="${i}"><div class="sil">${silHTML(i)}</div><div class="tn">${esc(C.nom[i])}</div><div class="rb"></div>${R.fresh[k] ? '' : '<span class="x">×2+</span>'}</button>`).join('')}</div>
+      <button class="btn accent" data-act="closeov">Terminer</button>`;
+    return;
+  }
+  const i = R.ids[R.k];
+  ov.innerHTML = `<div class="dots" aria-label="Carte ${R.k + 1} sur ${R.ids.length}">${R.ids.map((_, k) => `<i class="${k <= R.k ? 'on' : ''}"></i>`).join('')}</div>
+    <button class="flip deal rr${C.r[i]}${R.open ? ' open' : ''}" data-act="flip" aria-label="${R.open ? 'Carte suivante' : 'Retourner la carte'}"><div class="fl">
+      <div class="face">${backHTML(C.t[i])}</div>
+      <div class="face front">${cardHTML(i, null)}</div>
+    </div></button>
+    <div class="row" id="revbadge" style="justify-content:center;min-height:30px">${R.open ? (R.fresh[R.k] ? '<span class="badge new">Nouvelle</span>' : '<span class="badge dup">Doublon</span>') : '<span class="small muted">Touche pour retourner</span>'}</div>
+    <div class="row" style="justify-content:center"><button class="btn ghost sm" data-act="skip">Tout révéler</button></div>`;
+}
+
+// ------------------------------------------------------------------ ÉCHANGES (entre licenciés, réglés par le serveur)
+async function loadOffers(force) {
+  if (!S || (!force && Date.now() - state.offersAt < 15000)) return;
+  state.offersAt = Date.now();
+  const { data, error } = await sb.from('offers').select('id,from_user,from_pseudo,give,want,status,taker,taker_pseudo,created_at,taken_at').order('created_at', { ascending: false }).limit(400);
+  state.offersLoaded = true; state.offersErr = !!error;
+  if (!error) state.offers = data.filter(o => o.give < N && o.want < N);
+  if (state.tab === 'echanges' && $('#overlay').hidden && !typing() && !state.busy) render();
+}
+const cardLine = (i, extra = '') => `<span class="chip r${C.r[i]}"></span><b>${esc(C.nom[i])}</b> <span class="muted">(${esc(C.deps[depOf[i]].c)})</span>${extra}`;
+const dateFR = d => new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+function viewTrades() {
+  const open = state.offers.filter(o => o.status === 'open');
+  const others = open.filter(o => o.from_user !== uid).sort((a, b) => ((S.counts[b.want] > 1) - (S.counts[a.want] > 1)) || ((!S.counts[b.give]) - (!S.counts[a.give])));
+  const mine = open.filter(o => o.from_user === uid);
+  const hist = state.offers.filter(o => o.status === 'taken' && (o.from_user === uid || o.taker === uid)).sort((a, b) => Date.parse(b.taken_at) - Date.parse(a.taken_at));
+  const dupList = []; for (let i = 0; i < N; i++) if (S.counts[i] > 1) dupList.push(i);
+  dupList.sort((a, b) => C.nom[a].localeCompare(C.nom[b], 'fr'));
+  const D = state.offerDraft;
+  let draft = '';
+  if (D) {
+    if (D.give == null || S.counts[D.give] < 2) D.give = dupList[0] ?? null;
+    const nq = norm(D.q || ''); const hits = [];
+    if (nq.length >= 2) { for (let i = 0; i < N; i++) if (C.normNames[i].includes(nq)) hits.push(i); hits.sort((a, b) => (!!S.counts[a] - !!S.counts[b]) || C.nom[a].localeCompare(C.nom[b], 'fr')); }
+    draft = `<div class="panel"><h3>Nouvelle offre</h3>
+      ${dupList.length ? `<label class="small" for="ogive">Je donne (un de mes doublons)</label>
+      <select id="ogive">${dupList.map(i => `<option value="${i}" ${D.give === i ? 'selected' : ''}>${esc(C.nom[i])} · ${RAR_NAMES[C.r[i]]} (×${S.counts[i]})</option>`).join('')}</select>` : '<p class="small muted">Tu n’as pas encore de doublon à proposer. Ouvre des boosters !</p>'}
+      <label class="small" for="owant">Je veux en échange</label>
+      ${D.want != null ? `<div class="row" style="justify-content:space-between"><span>${cardLine(D.want)}</span><button class="btn ghost sm" data-act="clearwant">Changer</button></div>`
+        : `<input type="search" id="owant" placeholder="Nom d'un joueur ou d'une joueuse" value="${esc(D.q || '')}" autocomplete="off">
+      <div class="results">${hits.slice(0, 12).map(i => `<button class="res" data-act="pickwant" data-i="${i}"><b><span class="chip r${C.r[i]}"></span>${esc(C.nom[i])}</b><span>${esc(C.deps[depOf[i]].c)} · ${S.counts[i] ? 'tu l’as' : 'manquante'}</span></button>`).join('')}</div>`}
+      <div class="row"><button class="btn accent" data-act="postoffer" ${D.want != null && D.give != null && D.want !== D.give ? '' : 'disabled'}>Publier l'offre</button><button class="btn ghost" data-act="canceldraft">Annuler</button></div>
+      <p class="small muted">Ton doublon est mis de côté pendant l’offre. Tu le récupères si tu la retires.</p>
+    </div>`;
+  }
+  const line = (o, act, who) => `<div class="offer"><div class="sw small">
+      <div class="muted">${esc(who)}</div>
+      <div>Donne ${cardLine(o.give, o.from_user !== uid && !S.counts[o.give] ? ' <span class="tagnew">manquante</span>' : '')}</div>
+      <div>Contre ${cardLine(o.want)}</div></div>${act}</div>`;
+  const T = state.tradeTab;
+  const doable = others.filter(o => S.counts[o.want] > 1).length;
+  let body = '';
+  if (!state.offersLoaded) body = '<div class="loading">Chargement…</div>';
+  else if (state.offersErr) body = emptyHTML('Échanges indisponibles.', 'Vérifie ta connexion puis touche « Actualiser ».');
+  else if (T === 'offres') body = (doable ? `<p class="small" style="padding:8px 0"><b>${doable}</b> offre${doable > 1 ? 's' : ''} que tu peux accepter avec tes doublons.</p>` : '') +
+    (others.length ? others.map(o => { const ok = S.counts[o.want] > 1; return line(o, `<button class="btn sm${ok ? ' accent' : ' ghost'}" data-act="accept" data-id="${o.id}" ${ok ? '' : 'disabled'}>${ok ? 'Échanger' : S.counts[o.want] ? 'Pas en double' : 'Tu ne l’as pas'}</button>`, 'Proposé par ' + o.from_pseudo); }).join('')
+      : emptyHTML('Aucune offre en attente.', 'Les offres des autres licenciés apparaîtront ici.'));
+  else if (T === 'mine') body = mine.length ? mine.map(o => line(o, `<button class="btn ghost sm" data-act="withdraw" data-id="${o.id}">Retirer</button>`, 'Publiée le ' + dateFR(o.created_at))).join('') : emptyHTML('Aucune offre publiée.', 'Touche « + Échanger » pour proposer un de tes doublons.');
+  else body = hist.length ? hist.map(o => { const me = o.from_user === uid; const gave = me ? o.give : o.want, got = me ? o.want : o.give;
+      return `<div class="offer"><div class="sw small"><div class="muted">Avec ${esc(me ? (o.taker_pseudo || 'un joueur') : o.from_pseudo)} · ${dateFR(o.taken_at)}</div><div>Donné ${cardLine(gave)}</div><div>Reçu ${cardLine(got)}</div></div></div>`; }).join('') : emptyHTML('Pas encore d’échange.', 'Tes échanges conclus seront listés ici.');
+  return `<div class="view">
+    <div class="head"><div><h2>Échanges</h2><p class="small muted">Un doublon contre la carte qui te manque.</p></div>${D ? '' : `<button class="btn accent sm" data-act="newoffer">+ Échanger</button>`}</div>
+    ${draft}
+    <div class="tabsub" role="tablist">${[['offres', `Offres · ${others.length}`], ['mine', `Mes offres · ${mine.length}`], ['hist', 'Historique']].map(([k, l]) => `<button role="tab" data-act="ttab" data-v="${k}" aria-selected="${T === k}">${l}</button>`).join('')}</div>
+    <section>${body}</section>
+    <button class="btn ghost sm" data-act="reloffers" style="align-self:center">Actualiser</button>
+  </div>`;
+}
+function emptyHTML(a, b) { return `<div class="panel center" style="padding:28px 16px;margin-top:12px"><p><b>${a}</b></p><p class="small muted">${b}</p></div>`; }
+const postOffer = () => busyRun(async () => {
+  const D = state.offerDraft; const sel = $('#ogive'); if (sel) D.give = Number(sel.value);
+  if (D.give == null || D.want == null) return;
+  await rpc('post_offer', { p_give: D.give, p_want: D.want });
+  state.offerDraft = null; state.tradeTab = 'mine'; toast('Offre publiée');
+  applyState(await rpc('my_state')); state.offersAt = 0; await loadOffers(true); render();
+});
+const withdraw = id => busyRun(async () => { const r = await rpc('withdraw_offer', { p_id: id }); toast(`Offre retirée, ${C.nom[r.give]} est revenue dans ta collection`); applyState(await rpc('my_state')); await loadOffers(true); render(); });
+const acceptOffer = id => busyRun(async () => {
+  try { const r = await rpc('accept_offer', { p_id: id }); toast(`Échange conclu : ${C.nom[r.got]} rejoint ta collection`); }
+  finally { applyState(await rpc('my_state')); await loadOffers(true); render(); }
+});
+
+// ------------------------------------------------------------------ PROFIL
+function bigStats() {
+  let own = 0, leg = 0; const depOwn = new Uint16Array(C.deps.length);
+  for (let i = 0; i < N; i++) if (S.counts[i]) { own++; if (C.r[i] === 4) leg++; depOwn[depOf[i]]++; }
+  let full = 0; C.deps.forEach((d, j) => { if (depOwn[j] === d.k) full++; });
+  return { own, leg, full };
+}
+function installHTML() {
+  if (STANDALONE()) return '<p class="small">L’appli est installée sur cet appareil.</p>';
+  if (deferredInstall) return '<p class="small">Ajoute Cartes HBLM à ton écran d’accueil : elle s’ouvrira en plein écran, comme un jeu.</p><button class="btn accent wide" data-act="install">Installer l’appli</button>';
+  if (IS_IOS) return '<p class="small">Sur iPhone, ouvre cette page dans <b>Safari</b>, touche le bouton <b>Partager</b> (le carré avec une flèche) puis <b>Sur l’écran d’accueil</b>.</p>';
+  return '<p class="small">Sur Android, ouvre le menu <b>⋮</b> de Chrome puis <b>Installer l’application</b> (ou <b>Ajouter à l’écran d’accueil</b>).</p>';
+}
+function viewProfil() {
+  const s = bigStats(); let th = 'system'; try { th = localStorage.getItem('cc-theme') || 'system'; } catch (e) {}
+  return `<div class="view">
+    <div class="head"><div><h2>${esc(S.pseudo)}</h2><p class="small muted">${fmt(S.opened)} boosters ouverts</p></div></div>
+    <div class="statgrid">
+      <div><b>${fmt(s.own)}</b><span>cartes sur ${fmt(N)} (${(s.own / N * 100).toFixed(1).replace('.', ',')} %)</span></div>
+      <div><b>${s.leg}</b><span>légendaires sur ${C.r.filter(r => r === 4).length}</span></div>
+      <div><b>${s.full}</b><span>équipes complètes sur ${C.deps.length}</span></div>
+      <div><b>${fmt(S.trades)}</b><span>échanges conclus</span></div>
+    </div>
+    <div class="panel"><h3>Installer sur le téléphone</h3>${installHTML()}</div>
+    <div class="panel"><h3>Thème</h3><div class="seg">${[['system', 'Comme l’appareil'], ['light', 'Clair'], ['dark', 'Sombre']].map(([v, l]) => `<button data-act="theme" data-v="${v}" aria-pressed="${th === v}">${l}</button>`).join('')}</div></div>
+    <div class="panel"><h3>Règles</h3>
+      <p class="small">Un booster gratuit toutes les 10 minutes (10 en réserve au plus), 5 cartes par booster, les cartes rares sortent moins souvent. Les doublons se recyclent en pièces ; une légendaire en double donne un fragment. Avec les pièces, achète un booster d’équipe ou fabrique la carte qui te manque. Échange tes doublons avec les autres licenciés.</p></div>
+    <div class="panel"><h3>D’où viennent les cartes ?</h3>
+      <p class="small">Licenciés du club, saison ${SEASON}. Seules les personnes qui ont accepté le droit à l’image apparaissent, avec leur nom, leur équipe et leur latéralité. Les stats et la rareté sont attribuées par le jeu (fidélité au club, rôle et hasard) : elles ne mesurent pas le niveau réel. Les cartes ne sont visibles que par les membres inscrits avec le code du club.</p></div>
+    <button class="btn ghost wide" data-act="logout">Se déconnecter</button>
+  </div>`;
+}
+function applyTheme(v) { try { localStorage.setItem('cc-theme', v); } catch (e) {} if (v === 'system') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme', v); }
+
+// ------------------------------------------------------------------ CONNEXION / INSCRIPTION
+const AUTH_ERR = { su_bad_code: 'Code du club incorrect. Demande-le à ton entraîneur.', su_pseudo_taken: 'Ce pseudo est déjà pris, choisis-en un autre.', su_bad_pseudo: 'Pseudo de 3 à 20 caractères : lettres, chiffres, espaces ou tirets.', su_bad_password: 'Mot de passe de 6 caractères minimum.', bad_login: 'Pseudo ou mot de passe incorrect.', not_member: 'Ce compte n’est pas inscrit au jeu.' };
+function viewAuth(msg) {
+  const su = state.authMode === 'signup';
+  return `<div class="auth">
+    <div class="authhead">${backHTML(2, '120px')}<h1>Cartes HBLM</h1><p class="muted">Collectionne les licenciés du Handball Lunel Marsillargues.</p></div>
+    <div class="tabsub" role="tablist"><button role="tab" data-act="authmode" data-v="login" aria-selected="${!su}">Se connecter</button><button role="tab" data-act="authmode" data-v="signup" aria-selected="${su}">Créer un compte</button></div>
+    <form id="authform" class="panel" novalidate>
+      <div class="field"><label class="small" for="apseudo">Pseudo</label><input type="text" id="apseudo" name="pseudo" autocomplete="username" autocapitalize="off" spellcheck="false" maxlength="20" required></div>
+      <div class="field"><label class="small" for="apw">Mot de passe</label><input type="password" id="apw" name="password" autocomplete="${su ? 'new-password' : 'current-password'}" minlength="6" required></div>
+      ${su ? '<div class="field"><label class="small" for="acode">Code du club</label><input type="text" id="acode" name="code" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Donné par ton entraîneur" required></div>' : ''}
+      <p class="autherr" id="autherr" role="alert">${esc(msg || '')}</p>
+      <button class="btn accent wide" type="submit">${su ? 'Créer mon compte' : 'Se connecter'}</button>
+    </form>
+    <p class="small muted center">${su ? 'Aucune adresse mail n’est demandée : retiens bien ton pseudo et ton mot de passe. Ton pseudo est visible des autres joueurs dans les échanges.' : 'Mot de passe oublié ? Demande à un responsable du club de le réinitialiser.'}</p>
+  </div>`;
+}
+function showAuth(msg) {
+  S = null; $('.app').hidden = true; $('#overlay').hidden = true;
+  const a = $('#auth'); a.hidden = false; a.innerHTML = viewAuth(msg);
+}
+async function doAuth(f) {
+  const pseudo = f.pseudo.value.trim().replace(/\s+/g, ' '), pw = f.password.value; const err = $('#autherr'); const btn = f.querySelector('button[type=submit]');
+  err.textContent = '';
+  if (slugOf(pseudo).length < 3) { err.textContent = state.authMode === 'signup' ? AUTH_ERR.su_bad_pseudo : AUTH_ERR.bad_login; return; }
+  if (pw.length < 6) { err.textContent = state.authMode === 'signup' ? AUTH_ERR.su_bad_password : AUTH_ERR.bad_login; return; }
+  btn.disabled = true; btn.textContent = 'Un instant…';
+  try {
+    if (state.authMode === 'signup') {
+      const r = await fetch(SB_URL + '/functions/v1/signup', { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: SB_KEY }, body: JSON.stringify({ pseudo, password: pw, code: f.code.value }) });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error('su_' + (j.error || 'server'));
+    }
+    const { error } = await sb.auth.signInWithPassword({ email: slugOf(pseudo) + '@' + EMAIL_DOMAIN, password: pw });
+    if (error) throw new Error(/invalid/i.test(error.message) ? 'bad_login' : error.message);
+    await startGame(true);
+  } catch (x) {
+    const m = String(x && x.message || '');
+    err.textContent = AUTH_ERR[m] || (/fetch|network|load failed/i.test(m) ? 'Pas de connexion. Réessaie quand tu as du réseau.' : 'Une erreur est survenue, réessaie.');
+    btn.disabled = false; btn.textContent = state.authMode === 'signup' ? 'Créer mon compte' : 'Se connecter';
+  }
+}
+async function startGame(fresh) {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { showAuth(); return; }
+  uid = session.user.id;
+  $('#auth').hidden = true; $('.app').hidden = false;
+  $('#main').innerHTML = '<div class="loading">Chargement des licenciés…</div>';
+  try {
+    const st = await rpc('my_state');
+    if (!C) await loadCards();
+    await loadPhotoList();
+    applyState(st);
+  } catch (e) {
+    if (String(e && e.message).includes('not_member')) { await sb.auth.signOut(); showAuth(AUTH_ERR.not_member); return; }
+    $('#main').innerHTML = `<div class="view"><div class="loading">${esc(errMsg(e))}</div><button class="btn accent" data-act="retry" style="align-self:center">Réessayer</button></div>`; return;
+  }
+  loadFavs();
+  if (fresh && !S.opened) toast(`Bienvenue ${S.pseudo} ! Tes 10 premiers boosters t’attendent.`);
+  setTab(state.tab);
+}
+async function logout() { await sb.auth.signOut().catch(() => {}); C = null; N = 0; uid = null; state.offers = []; state.offersLoaded = false; state.offerDraft = null; state.dep = null; state.tab = 'booster'; state.authMode = 'login'; document.querySelectorAll('nav.tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === 'booster'))); showAuth(); }
+
+// ------------------------------------------------------------------ événements
+document.addEventListener('submit', e => { if (e.target.id === 'authform') { e.preventDefault(); doAuth(e.target); } });
+document.addEventListener('click', e => {
+  const tabBtn = e.target.closest('nav.tabs button'); if (tabBtn) { if (S) setTab(tabBtn.dataset.tab); return; }
+  const el = e.target.closest('[data-act]'); if (!el) { if (e.target.id === 'overlay' && !state.reveal) { $('#overlay').hidden = true; } return; }
+  const a = el.dataset.act, i = el.dataset.i != null ? Number(el.dataset.i) : null;
+  switch (a) {
+    case 'authmode': state.authMode = el.dataset.v; $('#auth').innerHTML = viewAuth(); break;
+    case 'retry': startGame(); break;
+    case 'open': openBooster(false); break;
+    case 'openreg': openBooster(true); break;
+    case 'flip': {
+      const R = state.reveal;
+      if (!R.open) {
+        R.open = true; el.classList.add('open'); el.setAttribute('aria-label', 'Carte suivante');
+        const r = C.r[R.ids[R.k]];
+        $('#revbadge').innerHTML = (R.fresh[R.k] ? '<span class="badge new pop">Nouvelle</span>' : '<span class="badge dup pop">Doublon</span>') + (r >= 2 ? ` <span class="badge pop r${r}" style="background:var(--rc);color:#FFFFFF">${RAR_MARK[r]}${RAR_NAMES[r]}</span>` : '');
+      } else { R.k++; R.open = false; drawReveal(); }
+      break;
+    }
+    case 'skip': state.reveal.k = state.reveal.ids.length; drawReveal(); break;
+    case 'closeov': $('#overlay').hidden = true; { const wasReveal = !!state.reveal; state.reveal = null; render(); if (wasReveal) refreshState(true); } break;
+    case 'see': showCard(i); break;
+    case 'dep': state.dep = Number(el.dataset.j); state.f.s = 'all'; $('#main').scrollTop = 0; render(); animEnter(); break;
+    case 'back': state.dep = null; state.f.s = 'own'; render(); animEnter(); break;
+    case 'cmode': state.cmode = el.dataset.v; state.query = ''; render(); animEnter(); break;
+    case 'page': state.page = Number(el.dataset.v); $('#main').scrollTop = 0; render(); break;
+    case 'togglef': state.showF = !state.showF; render(); break;
+    case 'fav': { e.stopPropagation(); if (FAV.has(i)) FAV.delete(i); else FAV.add(i); saveFavs(); const on = isFav(i); el.classList.toggle('on', on); el.style.setProperty('--fo', on ? 1 : 0); el.setAttribute('aria-label', on ? 'Retirer des favoris' : 'Ajouter aux favoris'); if (state.f.s === 'fav') { const st = $('#main').scrollTop; render(); $('#main').scrollTop = st; } break; }
+    case 'setf': { const k = el.dataset.k, v = el.dataset.v; state.f[k] = (k === 'r' || k === 't') ? Number(v) : v; state.limit = 60; state.page = 0; const st = $('#main').scrollTop; render(); $('#main').scrollTop = st; break; }
+    case 'resetf': state.f = { r: -1, t: -1, s: 'all', sort: 'nom' }; state.limit = 60; render(); break;
+    case 'recycle': recycleAll(); break;
+    case 'recycle1': recycle1(i); break;
+    case 'craft': craft(i); break;
+    case 'gotab': setTab(el.dataset.t); break;
+    case 'nohint': try { localStorage.setItem('cartes-hblm-nohint', '1'); } catch (x) {} render(); break;
+    // échanges
+    case 'ttab': state.tradeTab = el.dataset.v; render(); break;
+    case 'reloffers': state.offersLoaded = false; render(); loadOffers(true); refreshState(true); break;
+    case 'newoffer': state.offerDraft = { q: '', want: null, give: null }; render(); break;
+    case 'givethis': $('#overlay').hidden = true; state.offerDraft = { q: '', want: null, give: i }; state.tradeTab = 'offres'; setTab('echanges'); break;
+    case 'wantthis': $('#overlay').hidden = true; state.offerDraft = { q: '', want: i, give: null }; state.tradeTab = 'offres'; setTab('echanges'); break;
+    case 'canceldraft': state.offerDraft = null; render(); break;
+    case 'pickwant': { const g = $('#ogive'); if (g) state.offerDraft.give = Number(g.value); state.offerDraft.want = i; render(); break; }
+    case 'clearwant': { const g = $('#ogive'); if (g) state.offerDraft.give = Number(g.value); state.offerDraft.want = null; state.offerDraft.q = ''; render(); break; }
+    case 'postoffer': postOffer(); break;
+    case 'withdraw': withdraw(Number(el.dataset.id)); break;
+    case 'accept': acceptOffer(Number(el.dataset.id)); break;
+    // profil
+    case 'theme': applyTheme(el.dataset.v); render(); break;
+    case 'install': if (deferredInstall) { deferredInstall.prompt(); deferredInstall.userChoice.finally(() => { deferredInstall = null; render(); }); } break;
+    case 'logout': logout(); break;
+    case 'delphoto': deletePhoto(i); break;
+  }
+});
+document.addEventListener('input', e => {
+  const restore = id => { const pos = e.target.selectionStart; render(); const q = $('#' + id); if (q) { q.focus(); q.setSelectionRange(pos, pos); } };
+  if (e.target.id === 'q') { state.query = e.target.value; state.page = 0; restore('q'); }
+  if (e.target.id === 'owant' && state.offerDraft) { state.offerDraft.q = e.target.value; const g = $('#ogive'); if (g) state.offerDraft.give = Number(g.value); restore('owant'); }
+});
+document.addEventListener('toggle', e => { if (e.target.id === 'regbox') state.regOpen = e.target.open; }, true);
+document.addEventListener('change', e => {
+  if (e.target.matches && e.target.matches('input[data-photo]') && e.target.files[0]) { uploadPhoto(+e.target.dataset.photo, e.target.files[0]); return; }
+  if (e.target.id === 'regdep') { const j = state.regDep = Number(e.target.value); const b = $('#regbtn'); if (b) { b.textContent = `Acheter · ${regPrice(j)} pièces`; b.disabled = S.coins < regPrice(j); } const m = $('#regmix'); if (m) m.textContent = regMix(j); }
+  if (e.target.id === 'ogive' && state.offerDraft) state.offerDraft.give = Number(e.target.value);
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#overlay').hidden && !state.reveal) $('#overlay').hidden = true; });
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && S) { refreshState(true); if (state.tab === 'echanges') loadOffers(true); } });
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstall = e; if (S && state.tab === 'profil' && $('#overlay').hidden) render(); });
+let ticks = 0;
+setInterval(() => {
+  if (!S) return; ticks++;
+  const before = S.stock; tickStock();
+  if (S.stock !== before) { setWallet(); if (state.tab === 'booster' && $('#overlay').hidden && !state.busy && !typing()) render(); }
+  const cd = $('#countdown'); if (cd) cd.textContent = S.stock >= STOCK_MAX ? 'Réserve pleine' : 'Prochain dans ' + mmss(nextIn());
+  if (document.visibilityState !== 'visible') return;
+  if (ticks % 60 === 0) refreshState(true);
+  if (state.tab === 'echanges' && ticks % 20 === 0) loadOffers(true);
+}, 1000);
+
+// ------------------------------------------------------------------ démarrage
+try { const th = localStorage.getItem('cc-theme'); if (th && th !== 'system') document.documentElement.setAttribute('data-theme', th); } catch (e) {}
+if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+sb.auth.onAuthStateChange(ev => { if (ev === 'SIGNED_OUT' && S) showAuth('Ta session a expiré, reconnecte-toi.'); });
+startGame();
+})();
+
+</script>
+</body>
+</html>
