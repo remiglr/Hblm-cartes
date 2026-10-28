@@ -435,7 +435,7 @@ let DEP_PRICE = [];
 function computePrices() {
   const val = r => CRAFT[r] + (r === 4 ? 0 : 0);
   let tot = 0; for (let i = 0; i < N; i++) tot += val(C.r[i]); const nat = tot / N;
-  DEP_PRICE = C.deps.map(d => { let s = 0; for (let i = d.s; i < d.s + d.k; i++) s += val(C.r[i]); return Math.max(30, Math.round(REGIONAL_BASE * (s / d.k) / nat / 10) * 10); });
+  DEP_PRICE = C.deps.map(d => { let s = 0; for (const i of d.ids) s += val(C.r[i]); return Math.max(30, Math.round(REGIONAL_BASE * (s / d.k) / nat / 10) * 10); });
 }
 const regPrice = j => DEP_PRICE[j] || REGIONAL_BASE;
 const RECYCLE = [1, 2, 5, 15, 0];            // pièces par doublon selon rareté (légendaire -> fragment)
@@ -484,7 +484,7 @@ const EMAIL_DOMAIN = 'joueurs.cartes-hblm.app';
 const SEASON = '2026-2027';
 const sb = window.supabase.createClient(SB_URL, SB_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storageKey: 'cartes-hblm-auth' } });
 const slugOf = p => p.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-const ERR = { no_stock: 'Plus de booster en réserve.', no_coins: 'Pas assez de pièces.', no_dup: 'Il te faut cette carte en double.', gone: 'Cette offre n’est plus disponible.', own_offer: 'C’est ta propre offre.', owned: 'Tu as déjà cette carte.', too_many: '10 offres en cours au maximum.', same_card: 'Choisis une carte différente.', bad_team: 'Équipe trop petite pour un booster.', not_member: 'Compte introuvable, reconnecte-toi.' };
+const ERR = { no_stock: 'Plus de booster en réserve.', no_coins: 'Pas assez de pièces.', no_dup: 'Il te faut cette carte en double.', gone: 'Cette offre n’est plus disponible.', own_offer: 'C’est ta propre offre.', owned: 'Tu as déjà cette carte.', too_many: '10 offres en cours au maximum.', same_card: 'Choisis une carte différente.', bad_team: 'Équipe trop petite pour un booster.', not_member: 'Compte introuvable, reconnecte-toi.', no_image_rights: 'Pas de droit à l’image pour ce licencié.' };
 function errMsg(e) {
   const m = String((e && (e.message || e.error)) || '');
   for (const k in ERR) if (m.includes(k)) return ERR[k];
@@ -498,12 +498,12 @@ const typing = () => { const a = document.activeElement; return !!a && /^(INPUT|
 let C = null, N = 0, depOf, uid = null;
 async function loadCards() {
   const [cr, tr] = await Promise.all([
-    sb.from('cards').select('id,nom,team,t,r,sx,fid,lat,s').order('id'),
+    sb.from('cards').select('id,nom,team,t,r,sx,fid,lat,s,photo_ok').order('id'),
     sb.from('teams').select('id,name,code,grp,t,s,k').order('id')]);
   if (cr.error) throw cr.error; if (tr.error) throw tr.error;
   if (!cr.data.length) throw new Error('not_member');
-  const X = { nom: [], t: [], r: [], sx: [], fid: [], lat: [], s: [], season: SEASON, deps: tr.data.map(t => ({ c: t.code, n: t.name, reg: t.grp, s: t.s, k: t.k })) };
-  for (const c of cr.data) { X.nom[c.id] = c.nom; X.t[c.id] = c.t; X.r[c.id] = c.r; X.sx[c.id] = c.sx; X.fid[c.id] = c.fid; X.lat[c.id] = c.lat; for (let k = 0; k < 5; k++) X.s[c.id * 5 + k] = c.s[k]; }
+  const X = { nom: [], t: [], r: [], sx: [], fid: [], lat: [], s: [], season: SEASON, deps: tr.data.map(t => ({ c: t.code, n: t.name, reg: t.grp, k: 0, ids: [] })), photoOk: [] };
+  for (const c of cr.data) { X.nom[c.id] = c.nom; X.t[c.id] = c.t; X.r[c.id] = c.r; X.sx[c.id] = c.sx; X.fid[c.id] = c.fid; X.lat[c.id] = c.lat; for (let k = 0; k < 5; k++) X.s[c.id * 5 + k] = c.s[k]; X.photoOk[c.id] = c.photo_ok !== false; const d = X.deps[c.team]; if (d) { d.ids.push(c.id); d.k++; } }
   C = X; N = C.nom.length;
   C.code = C.nom.map((_, i) => String(i + 1).padStart(3, '0'));
   depOf = new Uint8Array(N); for (const c of cr.data) depOf[c.id] = c.team;
@@ -732,7 +732,7 @@ function viewCards() {
     ${pagerHTML(state.page, pages)}
   </div>`;
 }
-function depProgress(j) { const d = C.deps[j]; let n = 0; for (let i = d.s; i < d.s + d.k; i++) if (S.counts[i]) n++; return n; }
+function depProgress(j) { const d = C.deps[j]; let n = 0; for (const i of d.ids) if (S.counts[i]) n++; return n; }
 function viewCollection() {
   const own = owned(), rp = recyclePreview();
   const regions = {}; C.deps.forEach((d, j) => (regions[d.reg] = regions[d.reg] || []).push(j));
@@ -764,7 +764,7 @@ function viewDep() {
 }
 function fillDep() {
   const j = state.dep, d = C.deps[j];
-  const ids = []; for (let k = 0; k < d.k; k++) if (matches(d.s + k)) ids.push(d.s + k);
+  const ids = d.ids.filter(matches);
   sortIds(ids);
   $('#tilecount').textContent = `${fmt(ids.length)} carte${ids.length > 1 ? 's' : ''}`;
   $('#tiles').innerHTML = ids.map(i => { const c = S.counts[i]; return `<button class="tile r${C.r[i]} t${C.t[i]}${c ? '' : ' miss'}" data-act="see" data-i="${i}"><div class="sil">${silHTML(i)}</div><div class="tn">${esc(C.nom[i])}</div>${state.f.sort[0] === 's' ? `<div class="tv num">${STAT_NAMES[+state.f.sort.slice(1)].slice(0, 5)}. ${stat(i, +state.f.sort.slice(1))}</div>` : ''}<div class="rb"></div>${c > 1 ? `<span class="x">×${c}</span>` : ''}</button>`; }).join('') || '<p class="muted">Aucune carte dans ce filtre.</p>';
@@ -782,7 +782,8 @@ function showCard(i) {
         <button class="btn ghost" data-act="wantthis" data-i="${i}">La demander en échange</button>` : ''}
       ${c > 1 ? `<button class="btn" data-act="givethis" data-i="${i}">Proposer en échange</button>
         <button class="btn ghost" data-act="recycle1" data-i="${i}">Recycler 1 doublon · +${r === 4 ? '1 fragment' : RECYCLE[r] + ' pièce' + (RECYCLE[r] > 1 ? 's' : '')}</button>` : ''}
-      ${S.admin ? `<label class="btn ghost">${HAS_PHOTO.has(i) ? 'Changer la photo' : 'Ajouter une photo'}<input type="file" accept="image/*" data-photo="${i}" hidden></label>
+      ${S.admin && !C.photoOk[i] ? '<p class="small muted center">Pas de droit à l’image : pas de photo pour cette carte.</p>' : ''}
+      ${S.admin && C.photoOk[i] ? `<label class="btn ghost">${HAS_PHOTO.has(i) ? 'Changer la photo' : 'Ajouter une photo'}<input type="file" accept="image/*" data-photo="${i}" hidden></label>
         ${HAS_PHOTO.has(i) ? `<button class="btn ghost" data-act="delphoto" data-i="${i}">Retirer la photo</button>` : ''}
         <p class="small muted center">Admin : choisis une photo où seul ce licencié est reconnaissable.</p>` : ''}
       <button class="btn ghost" data-act="closeov">Fermer</button>
@@ -812,7 +813,7 @@ const IS_IOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platf
 let deferredInstall = null;
 function installHint() { try { if (STANDALONE() || localStorage.getItem('cartes-hblm-nohint')) return ''; } catch (e) { if (STANDALONE()) return ''; }
   return `<div class="hint"><span>Installe l’appli sur ton téléphone pour l’ouvrir comme un jeu.</span><button class="btn sm accent" data-act="gotab" data-t="profil">Comment ?</button><button class="x" data-act="nohint" aria-label="Masquer">✕</button></div>`; }
-function regMix(j) { const d = C.deps[j]; const n = [0, 0, 0, 0, 0]; for (let i = d.s; i < d.s + d.k; i++) n[C.r[i]]++; const rare = n[2] + n[3] + n[4]; return `${d.k} cartes, dont ${rare} rare${rare > 1 ? 's' : ''} ou mieux (${Math.round(rare / d.k * 100)} %)${n[4] ? ' et ' + n[4] + ' légendaire' + (n[4] > 1 ? 's' : '') : ''}.`; }
+function regMix(j) { const d = C.deps[j]; const n = [0, 0, 0, 0, 0]; for (const i of d.ids) n[C.r[i]]++; const rare = n[2] + n[3] + n[4]; return `${d.k} cartes, dont ${rare} rare${rare > 1 ? 's' : ''} ou mieux (${Math.round(rare / d.k * 100)} %)${n[4] ? ' et ' + n[4] + ' légendaire' + (n[4] > 1 ? 's' : '') : ''}.`; }
 function viewBooster() {
   tickStock();
   const deps = C.deps.map((d, j) => [d, j]).filter(([d]) => d.k >= CARDS_PER_BOOSTER);
@@ -842,7 +843,7 @@ async function openBooster(regional) {
   else { tickStock(); if (S.stock < 1) return; }
   state.busy = true;
   const ov = $('#overlay'); ov.hidden = false;
-  ov.innerHTML = `<div class="pack" aria-label="Ouverture du booster"><div class="packin">${backHTML(regional ? C.t[C.deps[j].s] : [3, 1, 2, 0][rnd(4)])}</div><span class="packlbl">${esc(label)} · ${CARDS_PER_BOOSTER} cartes</span></div>`;
+  ov.innerHTML = `<div class="pack" aria-label="Ouverture du booster"><div class="packin">${backHTML(regional ? C.t[C.deps[j].ids[0]] : [3, 1, 2, 0][rnd(4)])}</div><span class="packlbl">${esc(label)} · ${CARDS_PER_BOOSTER} cartes</span></div>`;
   let res;
   try { [res] = await Promise.all([rpc('open_booster', { p_team: j }), wait(1100)]); }
   catch (e) { state.busy = false; ov.hidden = true; toast(errMsg(e)); refreshState(true); return; }
@@ -975,7 +976,7 @@ function viewProfil() {
     <div class="panel"><h3>Règles</h3>
       <p class="small">Un booster gratuit toutes les 10 minutes (10 en réserve au plus), 5 cartes par booster, les cartes rares sortent moins souvent. Les doublons se recyclent en pièces ; une légendaire en double donne un fragment. Avec les pièces, achète un booster d’équipe ou fabrique la carte qui te manque. Échange tes doublons avec les autres licenciés.</p></div>
     <div class="panel"><h3>D’où viennent les cartes ?</h3>
-      <p class="small">Licenciés du club, saison ${SEASON}. Seules les personnes qui ont accepté le droit à l’image apparaissent, avec leur nom, leur équipe et leur latéralité. Les stats et la rareté sont attribuées par le jeu (fidélité au club, rôle et hasard) : elles ne mesurent pas le niveau réel. Les cartes ne sont visibles que par les membres inscrits avec le code du club.</p></div>
+      <p class="small">Licenciés du club, saison ${SEASON}. Chaque carte reprend le nom, l’équipe et la latéralité. Seules les personnes qui ont accepté le droit à l’image peuvent avoir une photo. Les stats et la rareté sont attribuées par le jeu (fidélité au club, rôle et hasard) : elles ne mesurent pas le niveau réel. Les cartes ne sont visibles que par les membres inscrits avec le code du club.</p></div>
     <button class="btn ghost wide" data-act="logout">Se déconnecter</button>
   </div>`;
 }
